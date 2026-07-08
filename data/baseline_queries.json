@@ -1,0 +1,34 @@
+[
+  {
+    "dataset": "usgs",
+    "label": "USGS - Earthquakes > 5.0 magnitude",
+    "query": "SELECT place, mag, time\nFROM earthquakes\nWHERE mag > 5.0\nORDER BY time DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "usgs",
+    "label": "USGS - Recent earthquakes in California",
+    "query": "SELECT place, mag, time\nFROM earthquakes\nWHERE place LIKE '%CA%' AND time > '2023-01-01'\nORDER BY mag DESC\nLIMIT 10",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - High temperature stations",
+    "query": "SELECT STATION, DATE, TMP\nFROM weather\nWHERE TMP > 25.0\nORDER BY TMP DESC\nLIMIT 15",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - Strong signal devices",
+    "query": "SELECT wlan_sa, radiotap_dbm_antsignal\nFROM wifi_network\nWHERE radiotap_dbm_antsignal > -50\nORDER BY radiotap_dbm_antsignal DESC\nLIMIT 10",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  }
+]

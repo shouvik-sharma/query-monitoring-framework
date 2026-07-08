@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+*.egg
+.venv/
+venv/
+env/
+*.so
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.env.local
+*.key
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Data (keep raw CSVs, ignore extracted archives)
+data/raw/kaggle_wifi/Dataset.zip
+*.zip
+*.gz
+
+# Logs
+*.log

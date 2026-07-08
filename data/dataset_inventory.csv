@@ -1,0 +1,4 @@
+name,local_path,exists,size_bytes,sha256
+USGS Earthquake Feed,data\raw\usgs\all_month.csv,True,2145510,32f99f17109af8035794d70b37e2bbab8fef26c56aa921e161b064c2ecfd0782
+NOAA Global Hourly Station Feed,data\raw\noaa\01001099999.csv,True,2302121,5e2d568df595d97bd4c8c95b2d36ad9de84df729fd82505c96816385bb532163
+AWID Wi-Fi Intrusion Mirror,data\raw\kaggle_wifi\extracted\AWID.csv,True,72186959,6efe4e897010823a6a086c685cf6886ed5935f3c8a6a807b46d7b3d42597d095

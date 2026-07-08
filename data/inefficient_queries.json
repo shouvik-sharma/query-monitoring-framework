@@ -1,0 +1,34 @@
+[
+  {
+    "dataset": "usgs",
+    "label": "USGS - SELECT * variant",
+    "query": "SELECT * FROM earthquakes",
+    "is_baseline": false,
+    "inefficiency_type": "select_star",
+    "expected_issue": "Unnecessary column selection"
+  },
+  {
+    "dataset": "usgs",
+    "label": "USGS - No filter variant",
+    "query": "SELECT place, mag, time FROM earthquakes ORDER BY mag DESC",
+    "is_baseline": false,
+    "inefficiency_type": "missing_predicate",
+    "expected_issue": "Full table scan without filters"
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - Cross join variant",
+    "query": "SELECT w1.STATION, w1.TMP, w2.TMP AS TMP2\nFROM weather w1, weather w2",
+    "is_baseline": false,
+    "inefficiency_type": "cross_join",
+    "expected_issue": "Unintended cross join"
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - Nested subquery variant",
+    "query": "SELECT * FROM (\n            SELECT * FROM wifi_network WHERE radiotap_dbm_antsignal > -70\n        ) AS t WHERE radiotap_dbm_antsignal > -60",
+    "is_baseline": false,
+    "inefficiency_type": "redundant_subquery",
+    "expected_issue": "Redundant filtering"
+  }
+]

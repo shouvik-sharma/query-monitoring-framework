@@ -1,0 +1,23 @@
+{
+  "datasets": [
+    {
+      "name": "USGS Earthquake Feed",
+      "source_url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv",
+      "local_path": "data/raw/usgs/all_month.csv",
+      "format": "csv"
+    },
+    {
+      "name": "NOAA Global Hourly Station Feed",
+      "source_url": "https://www.ncei.noaa.gov/data/global-hourly/access/2024/01001099999.csv",
+      "local_path": "data/raw/noaa/01001099999.csv",
+      "format": "csv"
+    },
+    {
+      "name": "AWID Wi-Fi Intrusion Mirror",
+      "source_url": "https://raw.githubusercontent.com/krishanuskr/AWID-Intrusion-Detection-System-2020/main/Dataset.zip",
+      "local_path": "data/raw/kaggle_wifi/extracted/AWID.csv",
+      "archive_path": "data/raw/kaggle_wifi/Dataset.zip",
+      "format": "csv"
+    }
+  ]
+}
