@@ -244,6 +244,7 @@ The results demonstrate that LLM-powered guardrails can be deployed at negligibl
 
 ## References
 
+0. Framework repository. https://github.com/shouvik-sharma/query-monitoring-framework
 1. USGS Earthquake Hazards Program. Earthquake Catalog. https://earthquake.usgs.gov/
 2. NOAA National Centers for Environmental Information. Global Hourly Data. https://www.ncei.noaa.gov/
 3. AWID Intrusion Detection Dataset. Kaggle Mirror. https://github.com/krishanuskr/AWID-Intrusion-Detection-System-2020

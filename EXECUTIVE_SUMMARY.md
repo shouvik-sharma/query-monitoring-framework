@@ -1,4 +1,4 @@
-# Executive Summary: AI-Powered Query Monitoring
+# Executive Summary: LLM-Powered Query Monitoring Framework
 
 **One-page overview for pitches, conferences, and quick reference**
 
@@ -21,261 +21,151 @@
 
 ## Our Solution (30 seconds)
 
-**AI-Powered Query Monitoring**: A lightweight, real-time system that:
+**LLM-Powered Query Monitoring Framework**: A lightweight, reproducible system that:
 
-1. **Detects** problematic Snowflake queries using GPT-5
-2. **Scores** each query 0-100 for correctness risk
-3. **Reviews** high-risk queries for specific issues
-4. **Rewrites** queries to fix problems automatically
-5. **Alerts** developers via Slack with actionable fixes
+1. **Ingests** public datasets (USGS, NOAA, AWID) into queryable tables
+2. **Executes** controlled SQL workloads against DuckDB
+3. **Analyzes** each query with an LLM (GPT-4o-mini) for risk scoring
+4. **Rewrites** inefficient queries with optimized SQL
+5. **Validates** rewrites through automated semantic comparison
 
-**Key innovation:** First production-ready system combining LLM-based anomaly detection + automated repair + developer-native alerts.
+**Key innovation:** Open-source, fully reproducible framework for evaluating LLM-based SQL analysis with honest, measured metrics.
 
 ---
 
 ## Results (1 minute)
 
-**Metrics from 3 months of production use:**
+**Metrics from benchmark evaluation:**
 
 | Metric | Result |
 |--------|--------|
-| **Detection Precision** | 95% (95% of high-risk queries had real issues) |
-| **Rewrite Correctness** | 90% (90% of rewrites produce identical results) |
-| **Latency** | <6 seconds (discovery to alert) |
-| **Time Saved** | 30 min/query → instant alert |
-| **Annual Cost Savings** | $1,950+ per monitored warehouse |
-| **Uptime** | 99%+ (no ML model maintenance) |
+| **Detection Accuracy** | 100% (4/4 inefficient queries identified) |
+| **False Positive Rate** | 0% (all baselines correctly passed) |
+| **Semantic Match Rate** | 75% (3/4 rewrites preserved exact results) |
+| **Total LLM API Cost** | $0.000671 USD |
+| **Queries Evaluated** | 8 (4 baseline, 4 inefficient) |
 
-**Real-world impact:**
-- Detected 2,700 high-risk queries in 90 days
-- Prevented estimated $10K+ in wasted compute costs
-- Reduced query-fix turnaround from hours to minutes
-- 100% automated—no human training required
+**Anti-patterns tested:**
+- `SELECT *` (unnecessary column projection)
+- `missing_predicate` (full table scan without filters)
+- `cross_join` (unintended Cartesian product)
+- `redundant_subquery` (nested query overhead)
 
 ---
 
-## Why Now? Why Us? (1 minute)
+## Why This Matters (1 minute)
 
 **Why this problem matters:**
-- Snowflake usage explosion → exponentially more queries to monitor
-- Cost of slow queries: $100-$1,000/day per bad query
-- Time cost: Data engineers spend 20-30% of time debugging queries
+- Data warehouses process millions of queries daily
+- A single unnoticed cross join in a multi-terabyte warehouse can cost orders of magnitude more than the LLM analysis that catches it
+- Manual SQL review does not scale
 
 **Why LLMs are the answer:**
-- GPT-5 understands SQL semantics better than traditional ML
-- No training data required (works immediately)
-- No ML pipeline overhead (10x simpler than ML approaches)
-- Fast enough for real-time (API latency ~1 sec/query)
+- GPT-4o-mini understands SQL semantics without training data
+- No ML pipeline overhead
+- Cost per analysis: ~$0.000084 per query
 
-**Why we're well-positioned:**
-- Built in production at Chime (10K+ queries/day)
-- Tested over 3 months with real data
-- Validated by 95% precision on anomaly detection
-- Open source (proven adoption model)
+**Why this framework is unique:**
+- Fully reproducible using public datasets and open-source tooling
+- Honest metrics with documented limitations
+- Modular architecture adaptable to any SQL engine
 
 ---
 
 ## How It Works (1 minute)
 
 ```
-Query Discovery (Snowflake)
+Public DataSource (CSV)
     ↓
-Stage 1: LLM Scoring
-  - Input: SQL text
-  - Output: Risk score (0-100)
-  - Latency: <1 sec
+DuckDB Execution Engine
     ↓
-    Is score > 70?
-    ├─ No → Log & discard
-    └─ Yes ↓
-      Stage 2: LLM Review & Rewrite
-      - Generate bullet-point review
-      - Generate optimized SQL
-      - Latency: <5 sec
-          ↓
-      Stage 3: Slack Alert
-      - Send DM with details
-      - Include review & rewrite
-      - Latency: <200 ms
+query_history.db (SQLite)
+    ↓
+LLM Analyzer (GPT-4o-mini)
+    ↓
+Recommendation Engine
+    ↓
+Report Generator
 ```
 
-**Why this architecture:**
-- Sequential processing: Avoids rate limits, consistent latency
-- Real-time: <6 sec end-to-end
-- Minimal overhead: No ML model management
-- Extensible: Easy to add new stages (cost prediction, historical trending, etc.)
+**Key features:**
+- Modular: Pluggable data sources and execution engines
+- Reproducible: Entire pipeline from public data to measured results
+- Transparent: All limitations and caveats documented
 
 ---
 
-## Key Insights (2 minutes)
+## Results Detail
 
-### What Works Well ✅
-- **Missing JOINs**: Catches 100% of missing join conditions
-- **WHERE clause errors**: Identifies incorrect filtering
-- **SELECT ***: Recommends specific column selection
-- **Inefficient patterns**: Detects N+1 queries, suboptimal aggregations
+### LLM Scoring Accuracy
 
-### What's Harder ❌
-- **Domain-specific logic**: Requires business context (not in SQL alone)
-- **Subtle semantic errors**: Correct syntax, wrong business logic
-- **Performance due to data volume**: Slow queries that are correct
+| Metric | Value |
+|--------|-------|
+| Average baseline risk score | 15.0/100 |
+| Average inefficient risk score | 71.2/100 |
+| Separation margin | 56.2 points |
 
-### Our Approach to Errors
-- Conservative scoring: Only flag 80+ for CRITICAL issues
-- 95% precision: Low false-positive rate (developers trust alerts)
-- Graceful degradation: System handles API failures gracefully
+### Rewrite Performance
 
----
+| Query | Anti-Pattern | Original | Rewritten | Delta | Semantic |
+|:------|:-------------|:---------|:----------|:------|:---------|
+| USGS - SELECT * | select_star | 0.51ms | 0.65ms | -25.84% | Match |
+| USGS - No filter | missing_predicate | 1.01ms | 1.52ms | -50.12% | Match |
+| NOAA - Cross join | cross_join | 2.35ms | 1.60ms | +31.82% | Mismatch |
+| AWID - Nested subquery | redundant_subquery | 1.21ms | 2.04ms | -68.18% | Match |
 
-## Competitive Advantage (30 seconds)
-
-| Feature | Our System | Traditional ML | Manual Review |
-|---------|-----------|-----------------|--------------|
-| **Real-time?** | Yes (<6 sec) | No (hours-days) | No (manual) |
-| **Auto-fix?** | Yes (90% correct) | No | No |
-| **Dev-friendly?** | Yes (Slack) | No | Yes |
-| **Setup time?** | <1 hour | Days-weeks | N/A |
-| **Maintenance?** | None | Weekly model retraining | N/A |
-| **Cost** | $0.01/query | $X/month infrastructure | $Y/person-hours |
+> **Caution:** Sub-millisecond measurements reflect Python-to-DuckDB overhead, not query-engine execution cost. The structural value of each rewrite (eliminated cross join, explicit column projection, WHERE predicate) should be evaluated at warehouse scale.
 
 ---
 
-## Business Model & Go-To-Market (optional)
+## Competitive Advantage
 
-### Current State
-- **Open source**: Published on GitHub
-- **Deployment**: Can run on any serverless/light VM
-- **Audience**: Snowflake users (100K+ companies globally)
-
-### Monetization Options (if pursued)
-1. **SaaS**: Hosted monitoring service ($200-$1K/month per warehouse)
-2. **Enterprise licensing**: For large organizations
-3. **Consulting**: Help companies customize & deploy
-4. **Stay open source**: Build community & visibility
-
-**Recommendation for now**: Stay open source to build community, establish authority, gather feedback.
+| Feature | Our Framework | Rule-Based Systems | Manual Review |
+|---------|:-------------|:-------------------|:--------------|
+| **Auto-detect anti-patterns** | Yes (100% accuracy) | Limited (known patterns) | No |
+| **Semantic validation** | Yes (automated) | No | Manual |
+| **Cost to run** | $0.000084/query | Infrastructure cost | Engineer hours |
+| **Reproducible** | Yes (public data) | Varies | No |
+| **Open source** | Yes | Rarely | N/A |
 
 ---
 
-## Roadmap (Next 6-12 months)
+## Future Work
 
-### Short-term (Months 1-3)
-- Multi-model scoring (GPT-5 + Claude + Llama ensemble)
-- Cost prediction: Add estimated query cost to alerts
-- Historical trending: Track which queries get flagged repeatedly
-- User feedback loop: "This rewrite worked/failed"
-
-### Medium-term (Months 4-6)
-- Multi-warehouse support
-- Team dashboards & reporting
-- Custom rules: User-defined risk criteria
-- BI tool integration (Looker, Tableau upstream monitoring)
-
-### Long-term (Months 7-12)
-- Interactive debugging agent: "Why is this slow?"
-- Automated schema optimization: Suggest table redesigns
-- Industry benchmarking: Compare to peer performance
-- Multi-database support: PostgreSQL, Redshift, BigQuery
-
----
-
-## Why Invest in This Research? (For yourself)
-
-✅ **Career impact:**
-- Positions you as thought leader in LLM + data systems
-- Speaks to growing trend of AI in data operations
-- Open source contribution = credibility & community
-
-✅ **Market timing:**
-- Explosion of LLM-powered tooling right now
-- Data teams actively exploring LLM solutions
-- Early mover advantage in this niche
-
-✅ **Technology impact:**
-- Concrete proof that LLMs solve real operational problems
-- Shows how to build production-grade AI features (not just demos)
-- Invites collaboration & iteration from broader community
-
-✅ **Financial potential:**
-- Open source can lead to SaaS opportunities
-- Consulting contracts from companies wanting to deploy
-- Speaking/conference opportunities
+1. **Expand workload:** Add TPC-H/TPC-DS benchmarks (50-100 queries)
+2. **Multi-engine support:** Snowflake, BigQuery, PostgreSQL adapters
+3. **Production ingestion:** Real query history from warehouse logs
+4. **Multi-model evaluation:** Compare GPT-4, Claude, Llama
+5. **Dashboard integration:** Visual query performance trends
 
 ---
 
 ## Call to Action
 
-**For you (researcher):**
-- Publish this week on Towards Data Science (reach 50K readers)
-- Pitch to Snowflake Summit & DataCouncil (conferences)
-- Build community on GitHub (100+ stars = credibility)
+**For researchers:**
+- Read the full paper: `RESEARCH_PAPER.md`
+- Clone and reproduce: `github.com/shouvik-sharma/query-monitoring-framework`
+- Build on this work: multi-engine, larger workloads, production validation
 
-**For your audience:**
-- Download & run the open-source code
-- Try it on your own Snowflake queries
-- Contribute back: improvements, new features, bug fixes
-
-**For potential collaborators:**
-- Let's build v2 together
-- Ideas for extensions welcome
-- Open to partnerships/consulting
+**For data engineers:**
+- Try the framework on your own datasets
+- Contribute new anti-pattern detectors
+- Validate rewrites at warehouse scale
 
 ---
 
 ## Key Numbers (For Pitches)
 
-- **$X** annual savings (engineer time)
-- **95%** precision on anomaly detection
-- **<6 sec** latency
-- **90%** rewrite correctness
-- **0** ML models to maintain
+- **100%** detection accuracy
+- **0%** false positives
+- **75%** semantic match rate
+- **$0.000671** total LLM cost (8 queries)
+- **4** SQL anti-patterns tested
+- **3** public datasets
 - **100%** open source
-- **3 months** production validation
 
 ---
 
-## Frequently Asked Questions
-
-**Q: Is this production-ready?**
-A: Yes. Running in production at Chime for 3 months with real queries.
-
-**Q: How much does it cost to run?**
-A: ~$0.01/query scored = ~$30/month for 100 queries/day. Negligible compared to engineer time saved.
-
-**Q: Will you build a company around this?**
-A: Not immediately. Open source first to build community & gather feedback. SaaS opportunity exists if market validates.
-
-**Q: Can I use this with [my data warehouse]?**
-A: Currently Snowflake-specific. PostgreSQL, Redshift, BigQuery support coming in v2. Contributions welcome!
-
-**Q: What if the rewrite is wrong?**
-A: Always test in dev before production. 90% correctness rate = 10% may need tweaking. System designed for "safe fail"—wrong rewrite won't destroy data.
-
----
-
-## Where to Learn More
-
-| Resource | Link |
-|----------|------|
-| **GitHub** | [Link] (code, issues, discussions) |
-| **Paper** | `RESEARCH_PAPER.md` (full technical details) |
-| **Blog** | Towards Data Science (published) |
-| **Demo** | `demo.ipynb` (notebooks with examples) |
-| **Author** | [LinkedIn/Twitter/Email] |
-
----
-
-## TL;DR
-
-**What:** AI-powered real-time monitoring for Snowflake queries using GPT-5
-**Why:** Catch slow/incorrect queries in real-time → auto-fix → alert developers
-**Results:** 95% precision, <6 sec latency, 90% rewrite correctness, $2K+/year savings
-**Status:** Production-ready, open source, validated over 3 months
-**Next:** Publish research, build community, explore opportunities
-
----
-
-**Version:** 1.0 (Feb 2025)
-**Author:** Shouvik Sharma
-**GitHub:** [link]
-**Questions?** Contact: [email]
+**Version:** 2.0 (July 2026)
+**Author:** Shouvik Sharma, Data Engineer at Chime
+**GitHub:** https://github.com/shouvik-sharma/query-monitoring-framework

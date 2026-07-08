@@ -1,6 +1,6 @@
 # Publishing Your Research: Quick Start Guide
 
-This guide walks you through publishing your AI-Powered Query Monitoring research in 3 weeks.
+This guide walks you through publishing your LLM-Powered Query Monitoring research in 3 weeks.
 
 ## Week 1: Polish Your Paper & Gather Evidence
 
@@ -107,9 +107,9 @@ Real data from your research...
 
 ## Results
 
-- 95% precision
-- <6 second latency
-- $2K/year savings
+- 100% detection accuracy
+- 0% false positives
+- $0.000671 total LLM cost
 
 ## Open Source
 
@@ -243,81 +243,75 @@ By attending, audience will learn:
 
 ### LinkedIn Post
 ```
-🚀 Excited to share research: Real-Time Query Anomaly Detection Using LLMs
+🚀 Excited to share research: LLM-Powered Query Monitoring Framework
 
-Inspired by production challenges at Chime, I built an AI-powered system that:
+I built an open-source framework that evaluates LLM-based SQL analysis using reproducible benchmarks:
 
-✅ Detects problematic Snowflake queries in real-time
-✅ Scores them for correctness risk (0-100)
-✅ Auto-generates production-ready rewrites
-✅ Sends alerts via Slack
+✅ Ingests public datasets (USGS, NOAA, AWID)
+✅ Detects SQL anti-patterns with 100% accuracy
+✅ Auto-generates optimized rewrites
+✅ Validates rewrites through semantic comparison
 
 Results:
-• 95% precision on high-risk detection
-• <6 second latency from discovery to alert
-• 90% correctness on auto-generated rewrites
-• $2K+/year savings in engineer time
+• 100% detection accuracy for SQL anti-patterns
+• 0% false positive rate on baselines
+• 75% semantic match rate on rewrites
+• $0.000671 total LLM cost for 8 queries
 
-The system uses GPT-5 without requiring ML pipelines—making it lightweight & immediately deployable.
+📖 Full paper: RESEARCH_PAPER.md
+💻 Open source: https://github.com/shouvik-sharma/query-monitoring-framework
 
-📖 Full paper: [link]
-💻 Open source: [GitHub link]
-
-Would love feedback & thoughts from the data engineering community!
-
-#DataEngineering #Snowflake #LLMs #DataOps
+#DataEngineering #LLMs #SQL #OpenSource
 ```
 
 ### Twitter/X Post
 ```
-Just published: "Real-Time Query Anomaly Detection Using LLMs"
+Just published: "LLM-Powered Query Monitoring Framework"
 
-Real-time detection of problematic Snowflake queries + auto-rewrites + Slack alerts.
+Reproducible evaluation of LLM-based SQL analysis using public datasets.
 
-📊 95% precision | ⚡ <6s latency | 💰 $2K+/year savings
+📊 100% detection accuracy | 💰 $0.000671 total cost
 
-📖 Paper: [link]
-💻 GitHub: [link]
+📖 Paper: RESEARCH_PAPER.md
+💻 GitHub: https://github.com/shouvik-sharma/query-monitoring-framework
 
-Open source. Feedback welcome!
-
-#DataEng #LLMs #Snowflake
+#DataEng #SQL #LLMs
 ```
 
 ### Reddit Post (r/dataengineering)
 ```
-Title: Real-Time Query Anomaly Detection Using LLMs (Production-Ready System)
+Title: LLM-Powered Query Monitoring Framework — Reproducible Evaluation Using Public Data
 
-I built an AI-powered monitoring system for Snowflake queries as a hackweek project.
-It detects problematic queries in real-time using GPT-5 and sends Slack alerts.
+I built an open-source framework that evaluates LLMs for SQL analysis using public datasets (USGS, NOAA, AWID).
 
 The problem:
-- Slow/incorrect queries hidden in query logs
-- Manual review is expensive and slow
-- No real-time feedback to developers
+- Manual SQL review doesn't scale
+- Existing benchmarks are proprietary or non-reproducible
+- LLM-based optimization lacks transparent evaluation
 
 The solution:
-- Real-time monitoring of QUERY_HISTORY
-- LLM scoring for correctness risk (0-100)
-- Auto-generated rewrites for high-risk queries
-- Slack DMs with actionable insights
+- Modular framework with pluggable data sources and execution engines
+- 8-query workload (4 baseline, 4 inefficient) with documented anti-patterns
+- Automated semantic validation of rewrites
 
-Results from 3 months of production use:
-- 95% precision (low false-positive rate)
-- <6 second latency from discovery to alert
-- 90% of auto-generated rewrites are correct
-- Estimated $2K+/year savings in engineer time
+Results:
+- 100% detection accuracy (4/4 inefficient queries flagged)
+- 0% false positive rate (all baselines correctly passed)
+- 75% semantic match rate (3/4 rewrites preserved exact results)
+- $0.000671 total LLM API cost (GPT-4o-mini)
 
-The system is open source and deployed. Happy to answer questions about:
+The framework is fully reproducible using public datasets and open-source tooling.
+
+Repo: https://github.com/shouvik-sharma/query-monitoring-framework
+Paper: RESEARCH_PAPER.md
+
+Happy to answer questions about:
 - LLM prompt engineering for SQL
-- Integrating with Slack
-- Rate limiting & API costs
-- Handling LLM hallucinations
+- Semantic validation techniques
+- Cost-efficient LLM deployment
+- Reproducible benchmarking
 
-GitHub: [link]
-Paper: [link]
-
-Would appreciate feedback from the community!
+Feedback welcome!
 ```
 
 ---
