@@ -4,14 +4,14 @@
 
 ## 1. Executive Summary
 
-We evaluated 8 queries across three public datasets. The LLM correctly identified all 4 intentionally inefficient queries and generated optimized rewrites with a **0% semantic match rate** (0/4).
+We evaluated 8 queries across three public datasets. The LLM correctly identified all 4 intentionally inefficient queries and generated optimized rewrites with a **75% semantic match rate** (3/4).
 
 ### Key Metrics
 - **Detection accuracy**: 100% — all 4 inefficient queries scored above the 40-point threshold
 - **False positive rate**: 0% — all 4 baseline queries scored 15/100
-- **Semantic validation**: 0/4 rewrites preserved equivalent results; 1 cross-join rewrite correctly flagged as mismatch
-- **Total LLM API cost**: **$0.000763 USD** across all 8 analyses
-- **Runtime note**: Measurements operate at sub-millisecond scale (3-row datasets); the average delta of **-37.91%** is dominated by measurement noise, not query-engine behavior
+- **Semantic validation**: 3/4 rewrites preserved equivalent results; 1 cross-join rewrite correctly flagged as mismatch
+- **Total LLM API cost**: **$0.000671 USD** across all 8 analyses
+- **Runtime note**: Measurements operate at sub-millisecond scale (3-row datasets); the average delta of **-28.08%** is dominated by measurement noise, not query-engine behavior
 
 ## 2. Detection Accuracy
 
@@ -81,5 +81,5 @@ SELECT frame_time_epoch, wlan_sa, radiotap_dbm_antsignal, class FROM wifi_networ
 
 - The LLM **reliably detects** four common SQL anti-patterns (SELECT *, missing predicate, cross join, redundant subquery) with zero false positives.
 - The framework **validates semantic correctness**, correctly flagging the cross-join rewrite as a mismatch when row counts change.
-- Total LLM API cost of **$0.000763** across 8 analyses is negligible, making AI-powered query guardrails practical for any deployment.
+- Total LLM API cost of **$0.000671** across 8 analyses is negligible, making AI-powered query guardrails practical for any deployment.
 - Sub-millisecond runtime deltas are measurement noise on this dataset size; the structural improvements should be validated at warehouse scale.
