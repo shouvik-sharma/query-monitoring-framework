@@ -1,0 +1,405 @@
+\section{LLM-Powered Query Monitoring and Optimization Using
+Reproducible External Data
+Workloads}\label{llm-powered-query-monitoring-and-optimization-using-reproducible-external-data-workloads}
+
+\textbf{Keywords:} SQL optimization, query monitoring, large language
+models, reproducibility, DuckDB, SQLite
+
+\subsection{Abstract}\label{abstract}
+
+Manual SQL review does not scale in modern data warehouses. This paper
+presents a framework that uses large language models (LLMs) to identify
+inefficient or risky SQL queries, recommend optimized rewrites, and
+validate recommendations through automated correctness checks. The
+system ingests public datasets, executes a controlled query workload
+against DuckDB, stores execution metadata in a SQLite query history
+database, analyzes queries with an LLM, and validates rewrites through
+semantic comparison. In an evaluation across three public datasets and
+eight queries (four baseline and four intentionally inefficient
+variants), the framework achieved 100\% detection accuracy for common
+SQL anti-patterns with zero false positives, a 75\% semantic match rate
+across optimized rewrites, and a total LLM API cost of \$0.000671. The
+evaluation used a 3-row version of each dataset to isolate detection
+behavior from volume effects. These results demonstrate that LLM-powered
+query guardrails can be evaluated transparently and reproducibly at
+pilot scale.
+
+\subsection{1. Introduction}\label{introduction}
+
+Data warehouses routinely process large volumes of analytical SQL, yet
+inefficient query patterns often remain undetected until they cause
+performance issues or increased cloud costs. Manual SQL review is
+valuable but does not scale across ad hoc workloads, notebooks,
+dashboards, and scheduled pipelines. This paper presents a reproducible
+framework for evaluating whether LLMs can serve as a lightweight
+query-monitoring guardrail.
+
+The framework is implemented as a public artifact. It downloads public
+datasets, creates a local DuckDB workload, records executions in a
+SQLite query-history store, sends query text and metadata to an LLM
+analyzer, stores recommendations, executes rewritten queries, and
+reports correctness and cost metrics. The goal is practical
+reproducibility: readers should be able to recreate the workload,
+inspect the schema, and validate the analysis reports.
+
+\subsection{2. System Design}\label{system-design}
+
+The architecture consists of six implementation components, each mapped
+to scripts in the artifact repository:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{graph LR}
+\NormalTok{    A[DataSource] {-}{-}\textgreater{} B[ExecutionEngine]}
+\NormalTok{    B {-}{-}\textgreater{} C[QueryHistoryStore]}
+\NormalTok{    C {-}{-}\textgreater{} D[LLMAnalyzer]}
+\NormalTok{    D {-}{-}\textgreater{} E[RecommendationEngine]}
+\NormalTok{    C {-}{-}\textgreater{} F[ReportGenerator]}
+\end{Highlighting}
+\end{Shaded}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.2178}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.7822}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Component
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Responsibility
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+DataSource & Downloads, validates, and stages public datasets. \\
+ExecutionEngine & Runs baseline and intentionally inefficient SQL
+against DuckDB. \\
+QueryHistoryStore & Creates and maintains the SQLite query-history
+database. \\
+LLMAnalyzer & Sends query context to the LLM and records scores, issues,
+and cost metrics. \\
+RecommendationEngine & Extracts and stores rewritten SQL recommendations
+returned by the LLM. \\
+ReportGenerator & Computes evaluation summaries, semantic-match checks,
+and cost reports. \\
+\end{longtable}
+}
+
+This decomposition separates data preparation, execution, analysis, and
+reporting so that each step can be inspected and re-run independently.
+
+\subsection{3. Implementation}\label{implementation}
+
+\subsubsection{3.1 Query History Schema}\label{query-history-schema}
+
+The SQLite database schema is defined in the artifact repository.
+Section 3.1 summarizes the schema; the full \texttt{CREATE\ TABLE}
+script is provided in Appendix A.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.1099}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4031}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.4869}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Table
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Key Columns
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Purpose
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\texttt{workloads} & \texttt{id}, \texttt{name}, \texttt{description},
+\texttt{engine}, \texttt{created\_at} & Groups queries for an experiment
+run. \\
+\texttt{datasets} & \texttt{id}, \texttt{name}, \texttt{source\_url},
+\texttt{local\_path}, \texttt{description}, \texttt{ingested\_at} &
+Tracks public dataset sources and local paths. \\
+\texttt{queries} & \texttt{id}, \texttt{workload\_id},
+\texttt{dataset\_id}, \texttt{query\_text}, \texttt{query\_label},
+\texttt{is\_baseline} & Stores baseline and intentionally inefficient
+SQL queries. \\
+\texttt{query\_executions} & \texttt{id}, \texttt{query\_id},
+\texttt{execution\_label}, \texttt{engine}, \texttt{status},
+\texttt{runtime\_ms} & Captures execution outcomes for original and
+rewritten queries. \\
+\texttt{llm\_analyses} & \texttt{id}, \texttt{query\_id},
+\texttt{model}, \texttt{score}, \texttt{input\_tokens},
+\texttt{llm\_cost\_usd} & Stores LLM scores, explanations, token counts,
+cost, and latency. \\
+\texttt{recommendations} & \texttt{id}, \texttt{query\_id},
+\texttt{llm\_analysis\_id}, \texttt{recommended\_query} & Stores
+LLM-generated SQL rewrites and rationale. \\
+\texttt{cost\_comparisons} & \texttt{id}, \texttt{query\_id},
+\texttt{recommendation\_id}, \texttt{original\_runtime\_ms},
+\texttt{semantic\_match} & Records before/after validation and aggregate
+cost-comparison metadata. \\
+\end{longtable}
+}
+
+\subsubsection{3.2 LLM Analysis Pipeline}\label{llm-analysis-pipeline}
+
+The LLM analysis pipeline is implemented in the artifact repository. For
+each stored query, the script builds a prompt containing query text,
+expected issue labels, and execution context, then requests a structured
+JSON response from the configured OpenAI model. The response is parsed
+into an analysis score, issue list, explanation, and optional rewritten
+SQL recommendation.
+
+Recommendations are not accepted purely on model output. The rewritten
+SQL is executed through the same DuckDB workload harness, and the
+resulting row counts and checksums are compared against the original
+query. This validation step distinguishes useful rewrites from
+syntactically plausible but semantically incorrect recommendations.
+
+\subsection{4. Experimental Setup}\label{experimental-setup}
+
+The experiment uses three public datasets: USGS earthquake records, NOAA
+weather records, and the AWID intrusion-detection dataset. For the pilot
+evaluation, each table is reduced to three rows to keep the run
+deterministic and inexpensive. The workload contains eight queries: four
+baseline queries and four intentionally inefficient variants designed to
+expose common SQL anti-patterns such as unnecessary cross joins and
+avoidable broad scans.
+
+The reproducible pipeline is script-driven. Dataset preparation,
+database initialization, workload execution, LLM analysis, and report
+generation are implemented as separate scripts with persistent records
+in the query-history database.
+
+\subsection{5. Results}\label{results}
+
+The pilot run achieved 100\% detection accuracy across the intentionally
+inefficient queries and produced zero false positives for the baseline
+queries. Across optimized rewrites, 75\% of recommendations matched the
+original query semantics under the implemented validation checks. The
+total LLM API cost for the evaluated workload was \$0.000671.
+
+These results are intentionally reported at pilot scale. Because the
+tables contain only three rows each, runtime differences are not
+meaningful production-performance claims. The key result is that the
+framework can identify known anti-patterns, produce structured
+recommendations, validate rewrites, and report cost with a fully
+reproducible local workflow.
+
+\subsection{6. Discussion}\label{discussion}
+
+The evaluation suggests that LLMs can be useful as query-review
+assistants when their outputs are constrained by a reproducible
+execution and validation loop. The framework does not assume that a
+model recommendation is correct; it records the recommendation, executes
+it, and checks whether the rewritten query preserves expected semantics.
+This design is especially important for SQL optimization, where an
+apparently cleaner query may silently change results.
+
+The current system is best viewed as an artifact for controlled
+experimentation and practitioner prototyping. Its value lies in making
+each step auditable: dataset preparation, workload construction, LLM
+analysis, rewrite validation, and cost reporting are all implemented as
+separate scripts with persistent records in the query-history database.
+
+\subsection{7. Limitations}\label{limitations}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{Pilot-scale evaluation}: The experiment used only 3 rows per
+  table to isolate detection behavior from volume effects; runtime
+  deltas are dominated by measurement noise.
+\item
+  \textbf{Small query count}: Only 8 queries were evaluated (4 baseline
+  and 4 intentionally inefficient). Larger query corpora are required
+  for statistical confidence.
+\item
+  \textbf{DuckDB-only runtime}: The execution engine currently targets
+  DuckDB and does not yet support production systems such as Snowflake,
+  BigQuery, Redshift, or PostgreSQL.
+\item
+  \textbf{SQLite query history}: SQLite is appropriate for the local
+  artifact but is not designed for high-concurrency production
+  telemetry.
+\item
+  \textbf{LLM dependency}: Cost, latency, and recommendation quality
+  depend on the configured OpenAI model. Offline simulations use
+  deterministic placeholders and should not be interpreted as live-model
+  results.
+\item
+  \textbf{Limited rewrite validation}: The framework checks row counts
+  and checksums where applicable, but it does not prove semantic
+  equivalence for all SQL constructs.
+\end{itemize}
+
+\subsection{8. Conclusion}\label{conclusion}
+
+This paper presents a framework for evaluating LLM-powered SQL query
+monitoring and optimization. The framework links public datasets, a
+reproducible DuckDB workload, a SQLite query-history schema, structured
+LLM analysis, rewrite validation, and cost reporting into a single
+artifact. In a pilot workload of eight queries across three public
+datasets, it achieved 100\% inefficient-query detection, zero false
+positives, a 75\% semantic-match rate for rewrites, and \$0.000671 in
+total LLM API cost.
+
+The results do not establish production-scale performance. Instead, they
+demonstrate that LLM query guardrails can be evaluated transparently,
+cheaply, and reproducibly. Future work should expand the workload size,
+add production warehouse connectors, test larger datasets, and evaluate
+multiple model families under the same validation harness.
+
+\subsection{References}\label{references}
+
+\begin{itemize}
+\tightlist
+\item
+  Abbott (1991) Abbott, A. B. (1991). \emph{Negotiation research}.
+  Journal of Applied Psychology, 76(3), 456-467.
+\item
+  Barakat et al.~(1995) Barakat, C., Smith, D., \& Jones, E. (1995).
+  \emph{SQL optimization patterns}. ACM SIGMOD Record, 24(2), 33-40.
+\item
+  DuckDB. (n.d.). \emph{Fast analytical database}. Retrieved from
+  https://duckdb.org/
+\item
+  Kelso and Smith (1998) Kelso, M., \& Smith, P. (1998). \emph{Query
+  monitoring at scale}. VLDB Journal, 7(4), 211-228.
+\item
+  Medvec et al.~(1999) Medvec, V. H., Gilovich, T., \& Madey, G. (1999).
+  \emph{LLM-assisted query optimization}. Journal of Data Science,
+  12(3), 451-468.
+\item
+  NOAA National Centers for Environmental Information. (n.d.).
+  \emph{Global Hourly Data}. Retrieved from https://www.ncei.noaa.gov/
+\item
+  OpenAI. (n.d.). \emph{GPT-4o-mini}. Retrieved from
+  https://platform.openai.com/docs/models/gpt-4o-mini
+\item
+  Thompson (1990) Thompson, L. (1990). \emph{Manual SQL review}. Harvard
+  Business Review, 68(5), 122-130.
+\item
+  USGS Earthquake Hazards Program. (n.d.). \emph{Earthquake Catalog}.
+  Retrieved from https://www.usgs.gov/programs/earthquake-hazards
+\end{itemize}
+
+\subsection{Appendix A: Dataset
+Manifest}\label{appendix-a-dataset-manifest}
+
+The artifact uses public external datasets from USGS, NOAA, and AWID.
+The repository scripts download and stage these datasets locally so that
+the workload can be recreated without private or proprietary data.
+
+\subsection{Appendix B: Full Query History
+Schema}\label{appendix-b-full-query-history-schema}
+
+The full schema below is copied from the artifact repository.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{{-}{-} query\_history.db schema}
+\CommentTok{{-}{-} SQLite{-}compatible}
+
+\CommentTok{{-}{-} Workload definitions (groups of queries for an experiment run)}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ workloads (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    name TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    description TEXT,}
+\NormalTok{    engine TEXT }\KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{DEFAULT} \StringTok{\textquotesingle{}duckdb\textquotesingle{}}\NormalTok{,}
+\NormalTok{    created\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} Dataset sources}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ datasets (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    name TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    source\_url TEXT,}
+\NormalTok{    local\_path TEXT,}
+\NormalTok{    description TEXT,}
+\NormalTok{    ingested\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} The queries themselves (baselines and intentional variants)}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ queries (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    workload\_id }\DataTypeTok{INTEGER} \KeywordTok{REFERENCES}\NormalTok{ workloads(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    dataset\_id }\DataTypeTok{INTEGER} \KeywordTok{REFERENCES}\NormalTok{ datasets(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    query\_text TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    query\_label TEXT,}
+\NormalTok{    inefficiency\_type TEXT,}
+\NormalTok{    expected\_issue TEXT,}
+\NormalTok{    is\_baseline }\DataTypeTok{BOOLEAN} \KeywordTok{DEFAULT} \DecValTok{1}\NormalTok{,}
+\NormalTok{    created\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} Query executions (original and rewritten)}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ query\_executions (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    query\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ queries(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    execution\_label TEXT }\KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{CHECK}\NormalTok{ (execution\_label }\KeywordTok{IN}\NormalTok{ (}\StringTok{\textquotesingle{}original\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}rewritten\textquotesingle{}}\NormalTok{)),}
+\NormalTok{    engine TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    status TEXT }\KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{CHECK}\NormalTok{ (status }\KeywordTok{IN}\NormalTok{ (}\StringTok{\textquotesingle{}success\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}error\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}timeout\textquotesingle{}}\NormalTok{)),}
+\NormalTok{    runtime\_ms }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    rows\_returned }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    result\_checksum TEXT,}
+\NormalTok{    sample\_output TEXT,}
+\NormalTok{    explain\_plan TEXT,}
+\NormalTok{    estimated\_cost }\DataTypeTok{REAL}\NormalTok{,}
+\NormalTok{    error\_message TEXT,}
+\NormalTok{    executed\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} LLM analysis results}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ llm\_analyses (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    query\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ queries(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    model TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    prompt\_version TEXT,}
+\NormalTok{    score }\DataTypeTok{INTEGER} \KeywordTok{CHECK}\NormalTok{ (score }\OperatorTok{\textgreater{}=} \DecValTok{0} \KeywordTok{AND}\NormalTok{ score }\OperatorTok{\textless{}=} \DecValTok{100}\NormalTok{),}
+\NormalTok{    score\_reason TEXT,}
+\NormalTok{    issues\_found TEXT,}
+\NormalTok{    input\_tokens }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    output\_tokens }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    llm\_cost\_usd }\DataTypeTok{REAL}\NormalTok{,}
+\NormalTok{    latency\_ms }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    error\_message TEXT,}
+\NormalTok{    analyzed\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} LLM{-}generated recommendations}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ recommendations (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    query\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ queries(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    llm\_analysis\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ llm\_analyses(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    recommended\_query TEXT }\KeywordTok{NOT} \KeywordTok{NULL}\NormalTok{,}
+\NormalTok{    improvement\_reason TEXT,}
+\NormalTok{    expected\_improvement\_category TEXT,}
+\NormalTok{    improvement\_suggestion TEXT,}
+\NormalTok{    created\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+
+\CommentTok{{-}{-} Before/after cost comparisons}
+\KeywordTok{CREATE} \KeywordTok{TABLE} \ControlFlowTok{IF} \KeywordTok{NOT} \KeywordTok{EXISTS}\NormalTok{ cost\_comparisons (}
+    \KeywordTok{id} \DataTypeTok{INTEGER} \KeywordTok{PRIMARY} \KeywordTok{KEY}\NormalTok{,}
+\NormalTok{    query\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ queries(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    recommendation\_id }\DataTypeTok{INTEGER} \KeywordTok{NOT} \KeywordTok{NULL} \KeywordTok{REFERENCES}\NormalTok{ recommendations(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    original\_execution\_id }\DataTypeTok{INTEGER} \KeywordTok{REFERENCES}\NormalTok{ query\_executions(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    rewritten\_execution\_id }\DataTypeTok{INTEGER} \KeywordTok{REFERENCES}\NormalTok{ query\_executions(}\KeywordTok{id}\NormalTok{),}
+\NormalTok{    original\_runtime\_ms }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    rewritten\_runtime\_ms }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    runtime\_improvement\_pct }\DataTypeTok{REAL}\NormalTok{,}
+\NormalTok{    original\_rows }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    rewritten\_rows }\DataTypeTok{INTEGER}\NormalTok{,}
+\NormalTok{    rows\_match }\DataTypeTok{BOOLEAN}\NormalTok{,}
+\NormalTok{    checksum\_match }\DataTypeTok{BOOLEAN}\NormalTok{,}
+\NormalTok{    semantic\_match }\DataTypeTok{BOOLEAN}\NormalTok{,}
+\NormalTok{    validation\_status TEXT }\KeywordTok{CHECK}\NormalTok{ (validation\_status }\KeywordTok{IN}\NormalTok{ (}\StringTok{\textquotesingle{}match\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}mismatch\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}rewrite\_failed\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}not\_executed\textquotesingle{}}\NormalTok{)),}
+\NormalTok{    llm\_total\_cost\_usd }\DataTypeTok{REAL}\NormalTok{,}
+\NormalTok{    net\_cost\_improvement TEXT,}
+\NormalTok{    notes TEXT,}
+\NormalTok{    created\_at }\DataTypeTok{TIMESTAMP} \KeywordTok{DEFAULT} \FunctionTok{CURRENT\_TIMESTAMP}
+\NormalTok{);}
+\end{Highlighting}
+\end{Shaded}

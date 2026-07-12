@@ -159,6 +159,11 @@ python scripts/generate_report.py
 - SQLite for prototyping — not designed for production query volumes
 - Full CSV datasets (10k–211k records) are archived for replication at warehouse scale
 
+## Full Paper
+
+The full research paper is available in `RESEARCH_PAPER.md`.
+- Full paper: [RESEARCH_PAPER.md](RESEARCH_PAPER.md)
+
 ## License
 
 MIT. See `LICENSE`.
