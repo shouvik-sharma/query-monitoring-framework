@@ -1,3 +1,5 @@
+"""Analyze queries using LLM, generate optimized rewrites, store results in query_history.db."""
+
 import os
 import sqlite3
 import json
@@ -316,9 +318,9 @@ def main():
             rewritten_exec_id = cursor.lastrowid
             print(f"    Rewritten Runtime: {rewritten_exec['runtime_ms']:.2f}ms")
             
-            # Get original execution stats
-            cursor.execute("SELECT runtime_ms, rows_returned FROM query_executions WHERE id = ?", (orig_exec_id,))
-            orig_runtime, orig_rows = cursor.fetchone()
+             # Get original execution stats
+            cursor.execute("SELECT runtime_ms, rows_returned, result_checksum FROM query_executions WHERE id = ?", (orig_exec_id,))
+            orig_runtime, orig_rows, orig_checksum = cursor.fetchone()
             
             # Calculate cost comparisons
             # Note: with <10-row datasets, sub-millisecond runtimes are noisy.
@@ -328,7 +330,8 @@ def main():
                 runtime_improvement_pct = ((orig_runtime - rewritten_exec['runtime_ms']) / orig_runtime) * 100
 
             rows_match = int(orig_rows == rewritten_exec['rows_returned'])
-            semantic_match = int(rows_match and rewritten_exec['status'] == 'success')
+            checksum_match = int(orig_checksum == rewritten_exec.get('result_checksum', ''))
+            semantic_match = int(checksum_match and rewritten_exec['status'] == 'success')
             
             cursor.execute("""
                 INSERT INTO cost_comparisons (

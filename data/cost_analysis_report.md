@@ -1,6 +1,6 @@
 # LLM-Powered Query Monitoring: Measured Cost-Improvement Report
 
-*Generated from the query execution and analysis database.*
+*Generated from the query execution and analysis database. Evaluation uses 3-row pilot-scale tables; see RESEARCH_PAPER.md §5.1 for full dataset manifest.*
 
 ## 1. Executive Summary
 

@@ -13,22 +13,19 @@ This guide walks you through publishing your LLM-Powered Query Monitoring resear
 
 ### Day 3-4: Collect Performance Data
 ```python
-# Extract from your Snowflake logs:
-# - Total queries monitored
-# - High-risk queries detected (score > 70)
-# - Precision metrics
-# - Average latency
-# - Cost savings
+# For this framework, extract from query_history.db:
+# - Total queries evaluated
+# - Detection accuracy
+# - Semantic match rate
+# - LLM API cost
 
 # Save results to: research_metrics.json
 {
-  "monitoring_period_days": 90,
-  "total_queries_monitored": 90000,
-  "high_risk_queries": 2700,  # 3%
-  "precision": 0.95,
-  "avg_latency_seconds": 5.2,
-  "cost_savings_annual_usd": 1950,
-  "sample_alerts": 10
+  "total_queries": 8,
+  "detection_accuracy": 1.0,
+  "semantic_match_rate": 0.75,
+  "total_llm_cost_usd": 0.000671,
+  "model": "gpt-4o-mini"
 }
 ```
 

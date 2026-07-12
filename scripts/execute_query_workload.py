@@ -68,6 +68,14 @@ def setup_duckdb():
     print("Created sample data tables")
     return conn
 
+def compute_checksum(rows):
+    """Compute SHA-256 checksum of query results for semantic comparison."""
+    import hashlib
+    # Convert rows to a stable string representation
+    row_str = str(sorted([tuple(row) for row in rows]))
+    return hashlib.sha256(row_str.encode()).hexdigest()
+
+
 def execute_query(duckdb_conn, query, dataset):
     """Execute a query and return execution details"""
     start_time = time.time()
@@ -80,8 +88,14 @@ def execute_query(duckdb_conn, query, dataset):
         runtime_ms = (time.time() - start_time) * 1000
         rows_returned = len(result)
         
-        # Get query plan (DuckDB doesn't have explain plan like traditional DBs)
-        explain_plan = ""  # Placeholder for DuckDB
+        # Compute result checksum for semantic validation
+        result_checksum = compute_checksum(result)
+        
+        # Get query plan (DuckDB supports EXPLAIN)
+        try:
+            explain_plan = duckdb_conn.execute(f"EXPLAIN {query}").fetchone()[0]
+        except:
+            explain_plan = ""
         
         status = 'success'
         error_message = None
@@ -89,6 +103,7 @@ def execute_query(duckdb_conn, query, dataset):
     except Exception as e:
         runtime_ms = (time.time() - start_time) * 1000
         rows_returned = 0
+        result_checksum = ""
         explain_plan = ""
         status = 'error'
         error_message = str(e)
@@ -98,6 +113,7 @@ def execute_query(duckdb_conn, query, dataset):
         'status': status,
         'runtime_ms': runtime_ms,
         'rows_returned': rows_returned,
+        'result_checksum': result_checksum,
         'explain_plan': explain_plan,
         'error_message': error_message,
         'result': result
@@ -137,10 +153,10 @@ def store_execution(sqlite_conn, query_data, execution):
     cursor.execute(
         """INSERT INTO query_executions (
             query_id, execution_label, engine, status, runtime_ms, 
-            rows_returned, explain_plan, error_message
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+            rows_returned, result_checksum, explain_plan, error_message
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
         (query_id, 'original', 'duckdb', execution['status'], execution['runtime_ms'],
-         execution['rows_returned'], execution['explain_plan'], execution['error_message'])
+         execution['rows_returned'], execution['result_checksum'], execution['explain_plan'], execution['error_message'])
     )
     
     sqlite_conn.commit()

@@ -17,7 +17,7 @@ Shouvik Sharma is a data engineer at Chime with 5+ years of experience building 
 
 ## Social Links
 - GitHub: https://github.com/shouvik-sharma/query-monitoring-framework
-- LinkedIn: [your LinkedIn URL]
+- LinkedIn: https://linkedin.com/in/shouvik-sharma
 
 ## Speaking Topics
 I'm available to speak on:

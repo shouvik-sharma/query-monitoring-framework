@@ -1,9 +1,8 @@
+"""Initialize query_history.db with the schema defined in schema/query_history_schema.sql."""
+
 import sqlite3
 
-# Path to the database file
 DB_PATH = "data/query_history.db"
-
-# Path to the schema SQL file
 SCHEMA_PATH = "schema/query_history_schema.sql"
 
 def create_database():

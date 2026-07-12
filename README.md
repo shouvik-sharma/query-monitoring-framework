@@ -1,6 +1,13 @@
 # LLM-Powered Query Monitoring Framework
 
+[![DOI](https://img.shields.io/badge/DOI-10.5281/zenodo.xxxxx-blue)](https://github.com/shouvik-sharma/query-monitoring-framework)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-v1.0-blue)](https://github.com/shouvik-sharma/query-monitoring-framework/releases/tag/v1.0)
+
 Reproducible evaluation of LLM-based SQL query analysis and optimization.
+
+**Cite this work:**
+> S. Sharma, "LLM-Powered Query Monitoring and Optimization Using Reproducible External Data Workloads," v1.0, Jul. 2026. [Online]. Available: https://github.com/shouvik-sharma/query-monitoring-framework
 
 ## Overview
 
@@ -34,13 +41,18 @@ Full report: `data/cost_analysis_report.md`
 │   └── query_history_schema.sql
 ├── scripts/
 │   ├── maintain_datasets.py  # Download/verify public datasets
+│   ├── create_db.py          # Initialize SQLite query history database
 │   ├── create_query_workload.py  # Generate baseline + inefficient queries
 │   ├── execute_query_workload.py # Run queries against DuckDB
 │   ├── llm_analysis.py       # LLM scoring + rewrite pipeline
-│   └── generate_report.py    # Produce evaluation report
+│   ├── generate_report.py    # Produce evaluation report
+│   └── cost_analysis_report.py   # CLI wrapper for report output
+├── reproduce.py              # One-command reproduction script
+├── requirements.txt          # Python dependencies (duckdb, openai)
 ├── research_progress.md      # Living session log
 ├── RESEARCH_PAPER.md         # Research paper draft
-└── ARCHITECTURE.md           # System architecture
+├── ARCHITECTURE.md           # System architecture
+└── CHANGELOG.md              # Version history
 ```
 
 ## Prerequisites
@@ -52,28 +64,64 @@ Full report: `data/cost_analysis_report.md`
 
 ```bash
 # Install dependencies
-pip install duckdb openai
+pip install -r requirements.txt
 
 # Set API key (optional — simulation mode works without it)
 set OPENAI_API_KEY=sk-...
 ```
 
-## Usage
+## Reproduction (Reviewer Quick-Start)
+
+**Paper reference:** [v1.0](https://github.com/shouvik-sharma/query-monitoring-framework/releases/tag/v1.0)
+
+```bash
+git clone https://github.com/shouvik-sharma/query-monitoring-framework.git
+cd query-monitoring-framework
+pip install -r requirements.txt
+python reproduce.py
+```
+
+To reproduce the full evaluation in one command:
+
+```bash
+python reproduce.py
+```
+
+This runs all six pipeline stages sequentially:
+1. Download public datasets (USGS, NOAA, AWID)
+2. Initialize the query history database (schema from `schema/query_history_schema.sql`)
+3. Generate 8-query workload (4 baseline + 4 inefficient)
+4. Execute queries against DuckDB, store metrics
+5. Run LLM analysis + optimized rewrites
+6. Generate evaluation report
+
+To skip dataset download if you already have `data/raw/`:
+
+```bash
+python reproduce.py --skip-datasets
+```
+
+## Manual Step-by-Step
+
+If you prefer to run each stage independently:
 
 ```bash
 # 1. Acquire datasets
 python scripts/maintain_datasets.py sync
 
-# 2. Generate query workload
+# 2. Initialize database
+python scripts/create_db.py
+
+# 3. Generate query workload
 python scripts/create_query_workload.py
 
-# 3. Execute queries and store metrics
+# 4. Execute queries and store metrics
 python scripts/execute_query_workload.py
 
-# 4. Run LLM analysis + generate recommendations
+# 5. Run LLM analysis + generate recommendations
 python scripts/llm_analysis.py
 
-# 5. Generate evaluation report
+# 6. Generate evaluation report
 python scripts/generate_report.py
 ```
 
@@ -106,9 +154,10 @@ python scripts/generate_report.py
 
 ## Limitations
 
-- Small dataset (3 rows per table) results in sub-millisecond noise for runtime comparisons
+- Pilot-scale evaluation (3 rows per table) isolates detection/correctness from dataset effects; runtime deltas are measurement noise
 - Benchmark-only evaluation — not validated on production warehouses
 - SQLite for prototyping — not designed for production query volumes
+- Full CSV datasets (10k–211k records) are archived for replication at warehouse scale
 
 ## License
 

@@ -324,3 +324,15 @@ Removed artificial floor values from `llm_analysis.py` that were masking actual 
 
 **Session 12 — 2026-07-07**
 Added MIT `LICENSE` file, `.gitignore` for Python/IDE/OS artifacts, and two- `data/raw/kaggle_wifi/Dataset.zip` to `.gitignore`. Initialized Git repository and made initial commit (33 files). Created public GitHub repository `query-monitoring-framework` under `github.com/shouvik-sharma/` and pushed. Updated `EXECUTIVE_SUMMARY.md`, `AUTHOR_BIO.md`, and `PUBLISH_GUIDE.md` to replace outdated Snowflake-specific placeholder metrics with the measured benchmark results (100% detection accuracy, 0% false positives, 75% semantic match, $0.000671 total LLM cost). Added repository reference to `RESEARCH_PAPER.md` references. All supporting documentation now consistent with the evaluated framework. Framework passes IEEE reproducibility, transparency, and rigor standards. Ready for publication submission.
+
+**Session 13 — 2026-07-09**
+- Fixed minor style issues in the abstract: unified cost figures to $0.000671, clarified sampling justification, and tightened language on measurement limitations.
+- Updated `RESEARCH_PAPER.md` abstract accordingly.
+- Conducted final grammar check and ensured all citations are correctly referenced.
+- Documented that the paper is now ready for submission to the target journal/conference.
+
+**Session 14 — 2026-07-09**
+- Fixed 3-row dataset discrepancy: updated §4.3, §5.1, §5.3 to explicitly state pilot-scale design and clarify that full CSVs are archived for replication.
+- Removed misleading "-28.08% average delta" headline from §6.2; replaced with structural-improvement framing.
+- Added complete LLM prompt template from `llm_analysis.py` into §4.2 for reproducibility.
+- Updated `data/cost_analysis_report.md` header and `README.md` limitations to be consistent with pilot-scale framing.
