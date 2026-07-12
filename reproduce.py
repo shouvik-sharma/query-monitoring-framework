@@ -43,7 +43,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    print("LLM-Powered Query Monitoring — Reproduction Pipeline")
+    print("LLM-Powered Query Monitoring - Reproduction Pipeline")
     print(f"   Python: {sys.version}")
 
     if not args.skip_datasets:

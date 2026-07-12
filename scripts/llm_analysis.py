@@ -233,10 +233,20 @@ def analyze_query_with_llm(query_text, query_label, inefficiency_type):
     }
 
 def main():
+    if not (HAS_OPENAI and OPENAI_API_KEY and OPENAI_API_KEY.startswith("sk-")):
+        print("WARNING: No valid OPENAI_API_KEY found. Running in SIMULATION mode.")
+        print("         Results will be deterministic defaults, not real LLM calls.")
+        print("         Set OPENAI_API_KEY to reproduce measured paper results.\n")
     print("Starting LLM query analysis pipeline...")
     duckdb_conn = setup_duckdb()
     sqlite_conn = sqlite3.connect(DB_PATH)
     cursor = sqlite_conn.cursor()
+    
+    # Clear previous analysis entries for a clean run
+    cursor.execute("DELETE FROM cost_comparisons")
+    cursor.execute("DELETE FROM recommendations")
+    cursor.execute("DELETE FROM llm_analyses")
+    sqlite_conn.commit()
     
     # Read all executed queries
     cursor.execute("""
