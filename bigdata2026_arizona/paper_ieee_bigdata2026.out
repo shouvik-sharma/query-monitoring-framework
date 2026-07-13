@@ -1,0 +1,32 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Related Work}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{SQL Anti-pattern Detection and Static Analysis}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{LLMs for SQL Optimization and Rewriting}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Cloud Warehouse Monitoring and Governance}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Benchmarks for Reproducible Evaluation}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.5}{Gap Statement}{section.2}% 7
+\BOOKMARK [1][-]{section.3}{System Design and Methodology}{}% 8
+\BOOKMARK [2][-]{subsection.3.1}{System Overview and Data Flow}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.2}{Problem Formulation}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.3}{Anti-pattern Taxonomy}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.4}{Pipeline Pseudocode}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.5}{Architectural Components}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.6}{Design Rationale}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Implementation}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{Query History Schema}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.2}{LLM Analysis and Prompt Template}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.3}{Execution and Validation}{section.4}% 18
+\BOOKMARK [1][-]{section.5}{Experimental Setup}{}% 19
+\BOOKMARK [2][-]{subsection.5.1}{Datasets}{section.5}% 20
+\BOOKMARK [2][-]{subsection.5.2}{Workload Design}{section.5}% 21
+\BOOKMARK [2][-]{subsection.5.3}{Evaluation Methodology}{section.5}% 22
+\BOOKMARK [2][-]{subsection.5.4}{Experimental Environment}{section.5}% 23
+\BOOKMARK [1][-]{section.6}{Results}{}% 24
+\BOOKMARK [2][-]{subsection.6.1}{Detection Performance}{section.6}% 25
+\BOOKMARK [2][-]{subsection.6.2}{Semantic Validation Results}{section.6}% 26
+\BOOKMARK [2][-]{subsection.6.3}{LLM API Cost Analysis}{section.6}% 27
+\BOOKMARK [2][-]{subsection.6.4}{Scalability Considerations}{section.6}% 28
+\BOOKMARK [1][-]{section.7}{Discussion}{}% 29
+\BOOKMARK [1][-]{section.8}{Limitations and Future Work}{}% 30
+\BOOKMARK [1][-]{section.9}{Conclusion}{}% 31
+\BOOKMARK [1][-]{section*.2}{References}{}% 32

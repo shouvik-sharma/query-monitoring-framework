@@ -22,24 +22,13 @@
 \BIBdecl
 
 \bibitem{raasveldt2020duckdb}
-\BIBentryALTinterwordspacing
 M.~Raasveldt and H.~Muehleisen, ``Duckdb: An embeddable analytical database,''
-  in \emph{Proceedings of the 2020 Conference on Innovative Data Systems
-  Research (CIDR)}, 2020. [Online]. Available:
-  \url{https://www.cidrdb.org/cidr2020/papers/p29-raasveldt-cidr20.pdf}
-\BIBentrySTDinterwordspacing
-
-\bibitem{duckdbdocs}
-\BIBentryALTinterwordspacing
-{DuckDB Foundation}, ``Duckdb documentation,'' Online documentation, 2026,
-  accessed: 2026-07-12. [Online]. Available: \url{https://duckdb.org/docs/}
-\BIBentrySTDinterwordspacing
+  in \emph{Proc. Conf. Innovative Data Syst. Res. (CIDR)}, 2020.
 
 \bibitem{sqlite2026}
 \BIBentryALTinterwordspacing
-{SQLite Consortium}, ``Sqlite documentation,'' Online documentation, 2026,
-  accessed: 2026-07-12. [Online]. Available:
-  \url{https://www.sqlite.org/docs.html}
+{SQLite Consortium}, ``Sqlite documentation,'' Online, 2026, accessed:
+  2026-07-12. [Online]. Available: \url{https://www.sqlite.org/docs.html}
 \BIBentrySTDinterwordspacing
 
 \bibitem{sharma2026framework}
@@ -49,63 +38,126 @@ S.~Sharma, ``Query monitoring framework,'' GitHub repository, 2026, accessed:
   \url{https://github.com/shouvik-sharma/query-monitoring-framework}
 \BIBentrySTDinterwordspacing
 
-\bibitem{graefe1993volcano}
-G.~Graefe, ``The volcano optimizer generator: Extensibility and efficient
-  search,'' in \emph{Proc. IEEE Int. Conf. Data Eng. (ICDE)}, 1993, pp.
-  209--218.
+\bibitem{querylens}
+\BIBentryALTinterwordspacing
+``querylens: {SQL} inspection {CLI},'' GitHub, accessed: Jul. 2026. [Online].
+  Available: \url{https://github.com/querylens/querylens}
+\BIBentrySTDinterwordspacing
 
-\bibitem{some2023cost}
-R.~Some and A.~Others, ``Cost-based query optimization in the age of cloud data
-  warehouses,'' in \emph{Proc. ACM SIGMOD Int. Conf. Manage. Data}, 2023.
+\bibitem{sqlaudit}
+\BIBentryALTinterwordspacing
+J.~S. Lee, ``sqlaudit: {SQL} query auditor and optimizer,'' GitHub, 2026.
+  [Online]. Available: \url{https://github.com/JSLEEKR/sqlaudit}
+\BIBentrySTDinterwordspacing
 
-\bibitem{armbrust2021delta}
-M.~Armbrust, M.~Zaharia \emph{et~al.}, ``Delta lake: High-performance {ACID}
-  table storage over cloud object stores,'' in \emph{Proc. VLDB Endow.},
-  vol.~13, no.~12, 2020, pp. 3411--3424.
+\bibitem{gcpantipattern}
+\BIBentryALTinterwordspacing
+{Google Cloud Platform}, ``Bigquery anti-pattern recognition,'' GitHub, 2025.
+  [Online]. Available:
+  \url{https://github.com/GoogleCloudPlatform/bigquery-antipattern-recognition}
+\BIBentrySTDinterwordspacing
 
-\bibitem{zaharia2016apache}
-M.~Zaharia, R.~S. Xin, P.~Wendell \emph{et~al.}, ``Apache spark: A unified
-  engine for big data processing,'' \emph{Commun. ACM}, vol.~59, no.~11, pp.
-  56--65, 2016.
+\bibitem{dwhauditor}
+\BIBentryALTinterwordspacing
+{shirokurolab}, ``{DWH}-auditor: Bigquery cost optimization and data governance
+  auditing,'' GitHub, 2026. [Online]. Available:
+  \url{https://github.com/shirokurolab/dwh-auditor}
+\BIBentrySTDinterwordspacing
+
+\bibitem{rbot2025}
+Z.~Sun, X.~Zhou, G.~Li, X.~Yu, J.~Feng, and Y.~Zhang, ``R-bot: An {LLM}-based
+  query rewrite system,'' \emph{Proc. VLDB Endow.}, vol.~18, no.~12, pp.
+  5031--5044, 2025.
+
+\bibitem{llmopt2025}
+S.~Zhou \emph{et~al.}, ``{LLMOpt}: A query optimization method utilizing large
+  language models,'' 2025.
+
+\bibitem{llmsteer2024}
+P.~Akioyamen, Z.~Yi, and R.~Marcus, ``The unreasonable effectiveness of {LLMs}
+  for query optimization,'' 2024.
+
+\bibitem{lapuda2024}
+S.~Zhou \emph{et~al.}, ``No more optimization rules: {LLM}-enabled policy-based
+  multi-modal query optimizer,'' 2024.
+
+\bibitem{llm4hint2025}
+Y.~Zhang \emph{et~al.}, ``{LLM4Hint}: Leveraging large language models for hint
+  recommendation in offline query optimization,'' 2025.
+
+\bibitem{snowpatrol2023}
+\BIBentryALTinterwordspacing
+{Astronomer}, ``Snowpatrol: Anomaly detection and alerting for {Snowflake}
+  usage,'' GitHub, 2023. [Online]. Available:
+  \url{https://github.com/astronomer/snowpatrol}
+\BIBentrySTDinterwordspacing
+
+\bibitem{keebo2023}
+Keebo, ``Making data clouds smarter: Automated warehouse optimization using
+  data learning,'' Proc. ACM SIGMOD, 2023.
+
+\bibitem{bress2025snowflake}
+S.~Bress \emph{et~al.}, ``Workload insights from the {Snowflake} data cloud:
+  What do production analytic queries really look like?'' \emph{Proc. VLDB
+  Endow.}, vol.~18, no.~12, pp. 5126--5139, 2025.
+
+\bibitem{patterns2026}
+\BIBentryALTinterwordspacing
+{gundageren}, ``Patterns: {AI}-powered query pattern analysis,'' GitHub, 2026.
+  [Online]. Available: \url{https://github.com/gundageren/patterns}
+\BIBentrySTDinterwordspacing
+
+\bibitem{tpch}
+\BIBentryALTinterwordspacing
+{Transaction Processing Performance Council}, ``{TPC-H} benchmark specification
+  3.0.1,'' 2022. [Online]. Available: \url{https://www.tpc.org/tpch/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{tpcds}
+\BIBentryALTinterwordspacing
+------, ``{TPC-DS} benchmark specification 4.0.0,'' 2023. [Online]. Available:
+  \url{https://www.tpc.org/tpcds/}
+\BIBentrySTDinterwordspacing
+
+\bibitem{leis2015job}
+V.~Leis, A.~Gubichev, A.~Mirchev, P.~Boncz, A.~Kemper, and T.~Neumann, ``How
+  good are query optimizers, really?'' \emph{Proc. VLDB Endow.}, vol.~9, no.~3,
+  pp. 204--215, 2015.
+
+\bibitem{huo2025bird}
+N.~Huo \emph{et~al.}, ``{BIRD-INTERACT}: Re-imagining {Text-to-SQL} evaluation
+  for large language models via dynamic interactions,'' 2025.
+
+\bibitem{yu2018spider}
+T.~Yu, R.~Zhang, K.~Yang \emph{et~al.}, ``{SPIDER}: A large-scale human-labeled
+  dataset for complex and cross-domain semantic parsing and text-to-{SQL}
+  task,'' in \emph{Proc. Conf. Empirical Methods Natural Lang. Process.
+  (EMNLP)}, 2018.
 
 \bibitem{openai2026models}
 \BIBentryALTinterwordspacing
-{OpenAI}, ``Model documentation: Gpt-4o mini,'' Online documentation, 2026,
-  accessed: 2026-07-12. [Online]. Available:
+{OpenAI}, ``{GPT}-4o mini documentation,'' Online, 2026, accessed: 2026-07-12.
+  [Online]. Available:
   \url{https://platform.openai.com/docs/models/gpt-4o-mini}
 \BIBentrySTDinterwordspacing
 
-\bibitem{chen2021evaluating}
-M.~Chen, J.~Tworek, H.~Jun \emph{et~al.}, ``Evaluating large language models
-  trained on code,'' \emph{arXiv preprint arXiv:2107.03374}, 2021.
-
-\bibitem{li2023llmsql}
-J.~Li \emph{et~al.}, ``Can {LLM} already serve as a database interface? a {BI}
-  benchmark study,'' in \emph{arXiv preprint arXiv:2305.03111}, 2023.
-
-\bibitem{kraska2018case}
-T.~Kraska, A.~Beutel, E.~H. Chi, J.~Dean, and N.~Polyzotis, ``The case for
-  learned index structures,'' \emph{Proc. ACM SIGMOD Int. Conf. Manage. Data},
-  pp. 489--504, 2018.
-
 \bibitem{usgs2026earthquake}
 \BIBentryALTinterwordspacing
-{U.S. Geological Survey}, ``Earthquake hazards program: Earthquake catalog,''
-  Online dataset and documentation, 2026, accessed: 2026-07-12. [Online].
-  Available: \url{https://www.usgs.gov/programs/earthquake-hazards}
+{U.S. Geological Survey}, ``Earthquake catalog,'' Online, 2026, accessed:
+  2026-07-12. [Online]. Available:
+  \url{https://www.usgs.gov/programs/earthquake-hazards}
 \BIBentrySTDinterwordspacing
 
 \bibitem{noaa2026ncei}
 \BIBentryALTinterwordspacing
-{NOAA National Centers for Environmental Information}, ``Global hourly data,''
-  Online dataset and documentation, 2026, accessed: 2026-07-12. [Online].
-  Available: \url{https://www.ncei.noaa.gov/}
+{NOAA NCEI}, ``Global hourly data,'' Online, 2026, accessed: 2026-07-12.
+  [Online]. Available: \url{https://www.ncei.noaa.gov/}
 \BIBentrySTDinterwordspacing
 
 \bibitem{awid2020github}
 \BIBentryALTinterwordspacing
-{AWID Dataset Mirror}, ``Awid intrusion detection system 2020,'' GitHub
-  repository, 2020, accessed: 2026-07-12. [Online]. Available:
+{AWID Dataset Mirror}, ``{AWID} intrusion detection system 2020,'' GitHub,
+  2020, accessed: 2026-07-12. [Online]. Available:
   \url{https://github.com/krishanuskr/AWID-Intrusion-Detection-System-2020}
 \BIBentrySTDinterwordspacing
 
