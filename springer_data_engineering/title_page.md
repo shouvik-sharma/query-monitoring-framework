@@ -6,12 +6,12 @@ LLM-Powered Query Monitoring and Optimization Using Reproducible External Data W
 **Authors**
 Shouvik Sharma
 Affiliation: Independent Researcher, India
-Email: shouvik.sharma@example.com
+Email: shouvik.s@somaiya.edu
 ORCID: 0000-0000-0000-0000
 
 **Corresponding Author**
 Shouvik Sharma
-Email: shouvik.sharma@example.com
+Email: shouvik.s@somaiya.edu
 
 **Acknowledgements**
 The author thanks the open-source community for providing public datasets and tools that made this work possible.

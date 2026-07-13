@@ -1,5 +1,7 @@
 # LLM-Powered Query Monitoring and Optimization Using Reproducible External Data Workloads
 
+**Author:** Shouvik Sharma (shouvik.s@somaiya.edu)
+
 ## Abstract
 
 Manual SQL review does not scale in modern data warehouses. We present an LLM-powered query monitoring framework that identifies inefficient or risky SQL queries, recommends optimized rewrites, and validates recommendations through automated correctness checks. The system ingests public datasets, executes a controlled query workload against DuckDB, stores execution metadata in a SQLite query history database, analyzes queries with an LLM, and validates rewrites through semantic comparison. In our evaluation across three public datasets and eight queries (four baseline and four intentionally inefficient variants), the framework achieved **100% detection accuracy** for common SQL anti-patterns with **zero false positives**, a **75% semantic match rate** across optimized rewrites, and a total LLM API cost of **$0.000671**. The evaluation was conducted on a pilot-scale workload that used a 3-row version of each dataset, enabling sub-millisecond runtimes. These results should be interpreted as pilot-scale evidence of a reproducible query guardrail, not as a production-scale benchmark.

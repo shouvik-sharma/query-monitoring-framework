@@ -17,7 +17,7 @@
 \author{\IEEEauthorblockN{Shouvik Sharma}
 \IEEEauthorblockA{\textit{Independent Researcher}\\
 India\\
-Email: TODO}}
+Email: shouvik.s@somaiya.edu}}
 
 \maketitle
 
@@ -39,11 +39,17 @@ This paper presents an LLM-powered query monitoring framework designed for repro
 The paper is positioned for IEEE BigData 2026 under Big Data Infrastructure, Big Data Management, Big Data Benchmarks, and Foundation Models for Big Data. It contributes: (1) a modular query-monitoring architecture for foundation-model-assisted SQL review; (2) a reproducible artifact that links public datasets, workload execution, query history, LLM analysis, and reporting; (3) a pilot benchmark measuring anti-pattern detection, rewrite validation, and LLM API cost; and (4) an explicit discussion of limitations needed before claiming production-scale performance.
 
 \section{Related Work and Motivation}
-Database management systems have long used cost-based optimizers to select physical query plans. These optimizers are powerful but operate inside the engine and usually do not explain application-level query intent to analysts. Query monitoring systems and warehouse telemetry can identify slow or expensive workloads, but they often require platform-specific integrations and manual diagnosis.
+We group prior literature into four themes that jointly motivate the proposed framework: (1) classical query optimization, (2) query monitoring and warehouse telemetry, (3) LLMs for code and SQL, and (4) reproducible benchmarks and artifact-driven evaluation.
 
-LLMs have demonstrated strong performance on code understanding and transformation tasks. SQL is a promising target because it is structured, widely used, and often amenable to local validation. At the same time, SQL rewrites are high risk: equivalence depends on data semantics, null behavior, joins, aggregation, and engine-specific syntax. This motivates an architecture where LLM recommendations are recorded and validated rather than trusted directly.
+\textbf{Classical query optimization.} Cost-based optimizers such as Volcano~\cite{graefe1993volcano} and cloud-native cost models~\cite{some2023cost} remain the foundation of query performance engineering. These optimizers operate inside the engine and select physical plans based on cardinality and cost estimates. They are powerful but largely opaque to end users: they do not typically explain application-level intent or surface common anti-patterns in human-readable terms.
 
-For IEEE BigData, the relevant gap is not only query optimization but reproducible evaluation. Big data papers frequently rely on large systems and proprietary workloads that are difficult to reproduce. This work instead emphasizes an artifact-first benchmark: public datasets, scripted workload execution, persistent query history, and explicit cost accounting.
+\textbf{Query monitoring and warehouse telemetry.} Lakehouse and data warehouse platforms such as Delta Lake~\cite{armbrust2021delta} and Apache Spark~\cite{zaharia2016apache} provide rich execution telemetry, including stage-level metrics and query plans. While these systems can identify slow workloads, they require platform-specific integrations and manual diagnosis. As a result, lightweight, language-driven review is rarely available across heterogeneous warehouses.
+
+\textbf{LLMs for code and SQL.} Recent foundation models such as GPT-4o mini~\cite{openai2026models} have shown strong performance on code understanding and transformation. Code evaluation benchmarks~\cite{chen2021evaluating} and text-to-SQL studies~\cite{li2023llmsql} suggest that LLMs can generate plausible SQL rewrites. However, these models are typically evaluated on synthetic queries or on standalone benchmarks, and their recommendations are rarely validated through re-execution against the original semantics.
+
+\textbf{Reproducible benchmarks and artifact-driven evaluation.} The big data community has long emphasized reproducibility through learned indexes~\cite{kraska2018case} and shared benchmarking infrastructure. Yet LLM-assisted query tools are usually evaluated without persistent query-history records, explicit cost accounting, or end-to-end artifact releases.
+
+\textbf{Gap addressed.} No prior work, to our knowledge, combines (1) a persistent query-history store, (2) LLM-assisted query analysis, (3) execution-based validation of rewrites, and (4) a fully reproducible public artifact. This paper bridges that gap by linking these four ingredients into a single auditable framework.
 
 \section{System Design}
 The framework is organized as six components. Each component maps to repository scripts to keep the implementation auditable.
