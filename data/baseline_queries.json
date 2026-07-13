@@ -1,16 +1,24 @@
 [
   {
     "dataset": "usgs",
-    "label": "USGS - Earthquakes > 5.0 magnitude",
-    "query": "SELECT place, mag, time\nFROM earthquakes\nWHERE mag > 5.0\nORDER BY time DESC\nLIMIT 20",
+    "label": "USGS - Large earthquakes by magnitude",
+    "query": "SELECT place, mag, time, latitude, longitude\nFROM earthquakes\nWHERE mag > 4.5\nORDER BY mag DESC\nLIMIT 25",
     "is_baseline": true,
     "inefficiency_type": null,
     "expected_issue": ""
   },
   {
     "dataset": "usgs",
-    "label": "USGS - Recent earthquakes in California",
-    "query": "SELECT place, mag, time\nFROM earthquakes\nWHERE place LIKE '%CA%' AND time > '2023-01-01'\nORDER BY mag DESC\nLIMIT 10",
+    "label": "USGS - Recent California earthquakes",
+    "query": "SELECT place, mag, time\nFROM earthquakes\nWHERE place LIKE '%CA%' AND time > '2023-01-01'\nORDER BY time DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "usgs",
+    "label": "USGS - Shallow earthquake count by region",
+    "query": "SELECT place, COUNT(*) AS cnt\nFROM earthquakes\nWHERE depth < 10.0\nGROUP BY place\nORDER BY cnt DESC\nLIMIT 15",
     "is_baseline": true,
     "inefficiency_type": null,
     "expected_issue": ""
@@ -18,7 +26,23 @@
   {
     "dataset": "noaa",
     "label": "NOAA - High temperature stations",
-    "query": "SELECT STATION, DATE, TMP\nFROM weather\nWHERE TMP > 25.0\nORDER BY TMP DESC\nLIMIT 15",
+    "query": "SELECT STATION, DATE, TMP, DEW\nFROM weather\nWHERE TMP > 30.0\nORDER BY TMP DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - Average temperature by station",
+    "query": "SELECT STATION, AVG(TMP) AS avg_temp, MIN(TMP) AS min_temp, MAX(TMP) AS max_temp\nFROM weather\nGROUP BY STATION\nORDER BY avg_temp DESC\nLIMIT 15",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - Days with large pressure drops",
+    "query": "SELECT STATION, DATE, SLP\nFROM weather\nWHERE SLP < 1005.0\nORDER BY SLP ASC\nLIMIT 20",
     "is_baseline": true,
     "inefficiency_type": null,
     "expected_issue": ""
@@ -26,7 +50,79 @@
   {
     "dataset": "awid",
     "label": "AWID - Strong signal devices",
-    "query": "SELECT wlan_sa, radiotap_dbm_antsignal\nFROM wifi_network\nWHERE radiotap_dbm_antsignal > -50\nORDER BY radiotap_dbm_antsignal DESC\nLIMIT 10",
+    "query": "SELECT wlan_sa, radiotap_dbm_antsignal, class\nFROM wifi_network\nWHERE radiotap_dbm_antsignal > -50\nORDER BY radiotap_dbm_antsignal DESC\nLIMIT 25",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - Normal traffic by MAC prefix",
+    "query": "SELECT SUBSTR(wlan_sa, 1, 8) AS mac_prefix, COUNT(*) AS cnt\nFROM wifi_network\nWHERE class = 'normal'\nGROUP BY mac_prefix\nORDER BY cnt DESC\nLIMIT 15",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - Attack signal distribution",
+    "query": "SELECT radiotap_dbm_antsignal, COUNT(*) AS cnt\nFROM wifi_network\nWHERE class = 'attack'\nGROUP BY radiotap_dbm_antsignal\nORDER BY cnt DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "products",
+    "label": "Products - Top-selling items",
+    "query": "SELECT category, product_name, price, stock_qty\nFROM products\nWHERE stock_qty > 0\nORDER BY price DESC\nLIMIT 30",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "products",
+    "label": "Products - Average price by category",
+    "query": "SELECT category, AVG(price) AS avg_price, COUNT(*) AS product_count\nFROM products\nGROUP BY category\nORDER BY avg_price DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "products",
+    "label": "Products - Low stock alerts",
+    "query": "SELECT product_name, category, stock_qty\nFROM products\nWHERE stock_qty < 10\nORDER BY stock_qty ASC\nLIMIT 25",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - High-value recent orders",
+    "query": "SELECT order_id, customer_id, total_amount, order_date\nFROM orders\nWHERE total_amount > 500.0\nORDER BY order_date DESC\nLIMIT 30",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - Monthly revenue summary",
+    "query": "SELECT STRFTIME('%Y-%m', order_date) AS month, SUM(total_amount) AS revenue, COUNT(*) AS order_count\nFROM orders\nGROUP BY month\nORDER BY month DESC\nLIMIT 24",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - Top customers by spend",
+    "query": "SELECT customer_id, COUNT(*) AS order_count, SUM(total_amount) AS total_spend\nFROM orders\nGROUP BY customer_id\nORDER BY total_spend DESC\nLIMIT 20",
+    "is_baseline": true,
+    "inefficiency_type": null,
+    "expected_issue": ""
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - Pending high-value orders",
+    "query": "SELECT order_id, customer_id, total_amount\nFROM orders\nWHERE status = 'pending' AND total_amount > 200.0\nORDER BY total_amount DESC\nLIMIT 20",
     "is_baseline": true,
     "inefficiency_type": null,
     "expected_issue": ""

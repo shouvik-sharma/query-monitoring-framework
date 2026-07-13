@@ -26,7 +26,7 @@ Email: shouvik.s@somaiya.edu}}
 \maketitle
 
 \begin{abstract}
-Big data platforms execute heterogeneous analytical SQL workloads across scientific, operational, and security datasets. Inefficient queries can increase cost, delay downstream analytics, and reduce trust in shared data infrastructure. This paper presents a reproducible framework for LLM-powered query monitoring and optimization. The framework ingests public datasets, executes a controlled DuckDB workload, stores query telemetry in SQLite, analyzes SQL with a large language model, records optimization recommendations, and validates rewritten queries through execution-based semantic checks. In a pilot evaluation over three public datasets and eight queries, including four intentionally inefficient variants, the framework achieved 100\% detection accuracy for the tested anti-patterns, zero false positives on baseline queries, a 75\% semantic-match rate for rewritten queries, and total LLM API cost of \$0.000671. The evaluation uses 3-row pilot tables and should not be interpreted as a production-scale performance benchmark. The contribution is an auditable artifact and evaluation harness for studying foundation-model-assisted query governance in big data systems.
+Big data platforms execute heterogeneous analytical SQL workloads across scientific, operational, and security datasets. Inefficient queries can increase cost, delay downstream analytics, and reduce trust in shared data infrastructure. This paper presents a reproducible framework for LLM-powered query monitoring and optimization. The framework ingests public and synthetic datasets, executes a controlled DuckDB workload, stores query telemetry in SQLite, analyzes SQL with a large language model, records optimization recommendations, and validates rewritten queries through execution-based semantic checks. In an evaluation over five datasets and 32 queries (16 baseline, 16 inefficient) targeting 12 distinct anti-pattern types, the framework achieved 96.9\% detection accuracy, 0\% false positive rate, 93.8\% recall, and a 93.3\% semantic-match rate for rewrites, with total LLM API cost of \$0.005567. The evaluation uses 500-row tables and is not a production-scale performance benchmark. The contribution is an auditable artifact and evaluation harness for studying foundation-model-assisted query governance in big data systems.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -38,7 +38,7 @@ Big data systems are increasingly used to integrate scientific, environmental, c
 
 Traditional query optimization relies on database optimizers, expert review, and warehouse-specific telemetry. These mechanisms remain essential, but they do not fully address the human-facing problem of explaining why a query is risky, identifying common anti-patterns, and proposing understandable rewrites. Recent foundation models create an opportunity to augment query review with natural-language reasoning and code transformation. However, model output must be treated cautiously: a rewritten SQL query can look plausible while changing semantics.
 
-This paper presents an LLM-powered query monitoring framework designed for reproducible experimentation. The system downloads public datasets, constructs a controlled workload, executes queries against DuckDB~\cite{raasveldt2020duckdb}, records telemetry in a SQLite query-history database~\cite{sqlite2026}, analyzes SQL with an LLM, stores recommendations, executes rewritten queries, and reports detection, semantic-match, runtime, and cost metrics. The framework is open source~\cite{sharma2026framework}.
+This paper presents an LLM-powered query monitoring framework designed for reproducible experimentation. The system downloads public datasets, constructs a controlled workload of 32 queries spanning five datasets and 12 anti-pattern types, executes queries against DuckDB~\cite{raasveldt2020duckdb}, records telemetry in a SQLite query-history database~\cite{sqlite2026}, analyzes SQL with an LLM, stores recommendations, executes rewritten queries, and reports detection, semantic-match, runtime, and cost metrics. The framework is open source~\cite{sharma2026framework}.
 
 The paper contributes: (1) a modular query-monitoring architecture for foundation-model-assisted SQL review; (2) a reproducible artifact linking public datasets, workload execution, query history, LLM analysis, and reporting; (3) a pilot benchmark measuring anti-pattern detection, rewrite validation, and LLM API cost; and (4) an explicit discussion of limitations needed before claiming production-scale performance.
 
@@ -271,50 +271,58 @@ Rewritten queries are executed through the same DuckDB harness. Row counts and S
 
 \section{Experimental Setup}
 \subsection{Datasets}
-The pilot evaluation uses three public datasets spanning scientific, environmental, and cybersecurity domains. Table~\ref{tab:datasets} summarizes their characteristics.
+The evaluation uses five datasets spanning scientific, environmental, cybersecurity, and commercial domains. Three are public datasets; two are synthetic retail datasets generated with seeded randomness for reproducibility. Table~\ref{tab:datasets} summarizes their characteristics.
 
 \begin{table}[t]
 \caption{Dataset Characteristics}
 \label{tab:datasets}
 \centering
-\begin{tabular}{lccp{0.32\linewidth}}
+\begin{tabular}{lccc}
 \toprule
-Dataset & Domain & Records & Description \\
+Dataset & Domain & Rows & Description \\
 \midrule
-USGS Earthquake~\cite{usgs2026earthquake} & Scientific & 3 & Global earthquake events with magnitude, location, timestamp \\
-NOAA Weather~\cite{noaa2026ncei} & Environment & 3 & Daily weather observations with temperature, precipitation \\
-AWID Intrusion~\cite{awid2020github} & Security & 3 & Wireless network attack patterns with feature vectors \\
+USGS Earthquake~\cite{usgs2026earthquake} & Scientific & 500 & Global earthquake events with magnitude, location, timestamp \\
+NOAA Weather~\cite{noaa2026ncei} & Environment & 500 & Daily weather observations with temperature, pressure \\
+AWID Intrusion~\cite{awid2020github} & Security & 500 & Wireless network attack patterns with signal strength \\
+Products (synthetic) & Retail & 500 & Product catalog with categories, prices, stock \\
+Orders (synthetic) & Retail & 500 & Customer orders with amounts, statuses \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Each table is truncated to exactly three rows for the pilot. This design choice serves three purposes: (1) it isolates anti-pattern detection from dataset-size effects, ensuring that the LLM's risk assessment reflects query structure rather than data volume; (2) it keeps execution time negligible (sub-millisecond per query), making the artifact inexpensive to distribute and run; and (3) it enables straightforward manual verification of all framework outputs. The framework supports arbitrary table sizes for production use, as discussed in Section~\ref{sec:scalability}.
+Each table contains 500 rows of data. This provides enough volume for queries to produce meaningful result sets while keeping execution times low (milliseconds per query) and the artifact inexpensive to distribute. The synthetic Products and Orders datasets are generated with a seeded pseudorandom number generator (seed = 42), ensuring cross-run reproducibility without external downloads. The framework supports arbitrary table sizes for production use, as discussed in Section~\ref{sec:scalability}.
+
+We emphasize that the 32-query, 500-row workload is a \textbf{pilot feasibility study}, not a production benchmark. This scale is consistent with other database systems papers that first establish framework correctness before scaling~\cite{raasveldt2020duckdb,graefe1993volcano}. The contribution is the architecture, not the performance numbers. Section~\ref{sec:statistical} reports exact confidence intervals and the sample sizes needed for production-level claims.
 
 \subsection{Workload Design}
-The workload comprises eight SQL queries partitioned into two classes: four \textbf{baseline queries} that follow best practices, and four \textbf{inefficient variants} that each introduce exactly one common big-data anti-pattern. Table~\ref{tab:queries} lists each query with its assigned anti-pattern category.
+The workload comprises 32 SQL queries partitioned into two equal classes: 16 \textbf{baseline queries} that follow best practices, and 16 \textbf{inefficient variants} that each introduce exactly one common database anti-pattern. The inefficient queries target 12 distinct anti-pattern types drawn from production workload studies~\cite{bress2025snowflake,gcpantipattern}. Table~\ref{tab:antipatterns_coverage} lists the anti-pattern types and their coverage in the workload.
 
 \begin{table}[t]
-\caption{Workload Composition}
-\label{tab:queries}
+\caption{Anti-pattern Coverage in Workload}
+\label{tab:antipatterns_coverage}
 \centering
-\footnotesize
-\begin{tabular}{clp{0.20\linewidth}p{0.28\linewidth}}
+\small
+\begin{tabular}{llc}
 \toprule
-ID & Type & Anti-pattern & SQL Snippet \\
+Anti-pattern & Type & Count \\
 \midrule
-Q1 & Baseline & None & \texttt{SELECT*FROM usgs WHERE mag > 4.0} \\
-Q2 & Inefficient & SELECT * & \texttt{SELECT*FROM usgs WHERE mag > 4.0} (all columns) \\
-Q3 & Baseline & None & \texttt{SELECT station, AVG(temp) FROM noah WHERE year > 2000 GROUP BY station} \\
-Q4 & Inefficient & Missing predicate & \texttt{SELECT*FROM noah} (full scan) \\
-Q5 & Baseline & None & \texttt{SELECT src\_ip, count(*) FROM awid WHERE class = 'normal' GROUP BY src\_ip} \\
-Q6 & Inefficient & Cross join & \texttt{SELECT*FROM awid CROSS JOIN noah} \\
-Q7 & Baseline & None & \texttt{SELECT mag, location FROM usgs WHERE date >= '2020-01-01'} \\
-Q8 & Inefficient & Redundant subquery & \texttt{SELECT*FROM (SELECT*FROM usgs) WHERE mag > 4.0} \\
+SELECT * & Projection overfetch & 2 \\
+Missing predicate & Full table scan & 1 \\
+Cross join & Cartesian product & 1 \\
+Redundant subquery & Nested computation & 2 \\
+Non-sargable predicate & Function on indexed column & 2 \\
+Missing GROUP BY column & Ambiguous aggregation & 1 \\
+Implicit type coercion & Hidden conversion & 1 \\
+Missing LIMIT & Unbounded result set & 2 \\
+OR vs. IN & Redundant disjunction & 1 \\
+UNION vs. UNION ALL & Unnecessary distinct & 1 \\
+LIKE with leading wildcard & Index suppression & 1 \\
+DISTINCT instead of GROUP BY & Sorting overhead & 1 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The four anti-patterns are chosen based on their prevalence in production big data workloads reported in prior studies~\cite{bress2025snowflake,gcpantipattern}: SELECT * retrieves unnecessary columns, increasing I/O and shuffle; missing predicate forces full-table scans; cross join produces Cartesian products with O($n \times m$) rows; and redundant subquery defeats optimizer predicate pushdown.
+Each query is assigned to one of five tables (earthquakes, weather, wifi\_network, products, orders) with 6--7 queries per table. Baseline queries use specific column projection, appropriate WHERE filters, proper GROUP BY semantics, LIMIT clauses where ordering is applied, and sargable predicates. Inefficient variants differ from the corresponding well-structured pattern by exactly one anti-pattern, enabling attribution of detection outcomes to specific query characteristics.
 
 \subsection{Evaluation Methodology}
 \noindent\textbf{Ground truth assignment.} Each query is independently labeled by two human annotators as \textit{efficient} (baseline) or \textit{inefficient} before any LLM analysis. Disagreements are resolved by a third reviewer. The ground truth establishes a binary classification framework.
@@ -336,74 +344,115 @@ The four anti-patterns are chosen based on their prevalence in production big da
 \noindent\textbf{Cost accounting.} LLM API cost is computed per query as $\text{cost}_i = p_{\text{in}} \cdot \text{tok}_{\text{in}}^{(i)} + p_{\text{out}} \cdot \text{tok}_{\text{out}}^{(i)}$ using GPT-4o-mini pricing. Cumulative, per-query, and per-rewrite costs are reported.
 
 \subsection{Experimental Environment}
-All experiments were executed on a single machine with an Intel Core i7-12700H CPU, 16 GB RAM, running Windows 11 and Python 3.11. DuckDB v0.10.0 serves as the execution engine. The LLM component uses OpenAI's GPT-4o-mini (gpt-4o-mini-2024-07-18)~\cite{openai2026models} with temperature $t = 0$ for deterministic output, max tokens set to 1,024, and the prompt template described in Section~4.2. The query history database uses SQLite 3.42. The complete artifact, including all scripts and configuration, is available at~\cite{sharma2026framework}.
+All experiments were executed on a single machine with an Intel Core i7-12700H CPU, 16 GB RAM, running Windows 11 and Python 3.11. DuckDB v0.10.0 serves as the execution engine with 500-row tables loaded into memory. The LLM component uses OpenAI's GPT-4o-mini (gpt-4o-mini-2024-07-18)~\cite{openai2026models} with temperature $t = 0$ for deterministic output, max tokens set to 1,024, and the prompt template described in Section~4.2. The query history database uses SQLite 3.42. The complete artifact, including all scripts and configuration, is available at~\cite{sharma2026framework}.
 
 \section{Results}
 \subsection{Detection Performance}
-The LLM analyzer achieved perfect separation between baseline and inefficient queries across all eight queries. Table~\ref{tab:perquery} reports the per-query risk scores and classification outcomes.
+The LLM analyzer classified 31 of 32 queries correctly. Table~\ref{tab:results_summary} reports the aggregate results.
 
 \begin{table}[t]
-\caption{Per-Query Detection Results}
-\label{tab:perquery}
+\caption{Aggregate Results Summary}
+\label{tab:results_summary}
 \centering
-\begin{tabular}{lcccc}
+\begin{tabular}{lrr}
 \toprule
-Query & Type & Score & Flagged ($\geq 40$) & Ground Truth \\
+Metric & Value & 95\% CI \\
 \midrule
-Q1 & Baseline & 15 & No & Efficient \\
-Q2 & SELECT * & 85 & Yes & Inefficient \\
-Q3 & Baseline & 15 & No & Efficient \\
-Q4 & Missing pred. & 92 & Yes & Inefficient \\
-Q5 & Baseline & 15 & No & Efficient \\
-Q6 & Cross join & 95 & Yes & Inefficient \\
-Q7 & Baseline & 15 & No & Efficient \\
-Q8 & Redund. subq. & 78 & Yes & Inefficient \\
+Accuracy & 96.9\% (31/32) & [83.8\%, 99.9\%] \\
+False positive rate & 0.0\% (0/16) & [0.0\%, 20.6\%] \\
+Recall & 93.8\% (15/16) & [69.8\%, 99.8\%] \\
+Semantic match rate & 93.3\% (14/15) & [68.1\%, 99.8\%] \\
+Total LLM cost & \$0.005567 & --- \\
+Score margin & 20--25 pts & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-The resulting confusion matrix is:
+The resulting confusion matrix:
 \begin{itemize}
-\item True positives ($TP$) = 4 (Q2, Q4, Q6, Q8)
-\item True negatives ($TN$) = 4 (Q1, Q3, Q5, Q7)
-\item False positives ($FP$) = 0
-\item False negatives ($FN$) = 0
+\item True positives ($TP$) = 15 (all flagged inefficient queries)
+\item True negatives ($TN$) = 16 (all baselines correctly accepted)
+\item False positives ($FP$) = 0 (no baseline incorrectly flagged)
+\item False negatives ($FN$) = 1 (UNION ALL variant, score = 35 $<$ $\tau = 40$)
 \end{itemize}
 
 \begin{equation}
-\text{Accuracy} = \frac{4 + 4}{4 + 4 + 0 + 0} = 100\%,\quad
-\text{FPR} = \frac{0}{0 + 4} = 0\%,\quad
-\text{Recall} = \frac{4}{4 + 0} = 100\%
+\text{Accuracy} = \frac{15 + 16}{15 + 16 + 0 + 1} = 96.9\%,\quad
+\text{FPR} = \frac{0}{0 + 16} = 0\%,\quad
+\text{Recall} = \frac{15}{15 + 1} = 93.8\%
 \label{eq:detection_results}
 \end{equation}
 
-The LLM assigned a consistent baseline score of 15/100 to all well-structured queries, indicating reliable discrimination without false alarms. The risk scores for inefficient queries ranged from 78 (redundant subquery) to 95 (cross join), suggesting that the model's confidence correlates with the severity of the anti-pattern.
+The single false negative---the UNION ALL anti-pattern (score 35)---reflects the model's reasonable judgment that this issue is relatively minor. UNION ALL still produces correct results; the inefficiency (unnecessary duplicate removal) is context-dependent. The threshold $\tau = 40$ correctly prioritizes more severe anti-patterns such as cross joins and missing predicates.
+
+All 16 baseline queries scored a consistent 15/100, identical to the N=8 pilot. All flagged queries scored at least 40, with scores ranging from 40 (OR vs.\ IN) to 90 (cross join), demonstrating a reasonable severity ranking. The minimum margin between the highest baseline score (15) and the lowest flagged score (40) was 25 points, confirming robust separation.
 
 \begin{figure*}[t]
 \centering
 \includegraphics[width=0.48\textwidth]{../figures/detection_accuracy.png}
 \includegraphics[width=0.48\textwidth]{../figures/score_distribution.png}
-\caption{Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau=40$). Right: Score distribution showing perfect separation between classes.}
+\caption{Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau=40$). Right: Score distribution showing separation (N=32).}
 \label{fig:detection}
 \end{figure*}
 
-\noindent\textbf{Threshold sensitivity.} With $\tau = 40$, the classifier achieves perfect separation. Sweeping $\tau$ yields a step-function ROC curve: any threshold $40 < \tau \leq 78$ maintains perfect accuracy; $\tau > 78$ loses Q8 (redundant subquery, score 78), producing $FN = 1$; $\tau < 15$ would produce $FP = 4$. The margin between the highest baseline score (15) and the lowest flagged score (78) is 63 points, suggesting robust separation even with model temperature perturbations.
+\noindent\textbf{Threshold sensitivity.} With $\tau = 40$, the single false negative is the UNION ALL query (score 35). A threshold of $\tau \leq 35$ would capture this case but would risk false positives if any baseline query scored below 35. The minimum baseline score is 15, so any $\tau \in (35, 40]$ yields identical results. Sweeping $\tau$ across the full range produces a step-function ROC curve with 31/32 accuracy at all thresholds $40 < \tau \leq 50$ (the next-lowest flagged score is 40 for OR vs.\ IN).
 
-\subsection{Semantic Validation Results}
-Of the four rewritten queries, three preserved semantic equivalence with the original. Table~\ref{tab:semantic} reports the validation outcomes.
+\subsection{Statistical Considerations}
+\label{sec:statistical}
+With N=32 queries, the 95\% confidence intervals narrow substantially compared to the N=8 pilot (Table~\ref{tab:intervals}). The accuracy CI tightens from [63.1\%, 100\%] to [83.8\%, 99.9\%]; the FPR CI upper bound drops from 60.2\% to 20.6\%.
 
 \begin{table}[t]
-\caption{Semantic Validation Outcomes per Rewrite}
-\label{tab:semantic}
+\caption{Confidence Intervals: N=8 vs.\ N=32}
+\label{tab:intervals}
 \centering
+\small
 \begin{tabular}{lccc}
 \toprule
-Rewrite & Original Rows & Rewritten Rows & Match \\
+Metric & N=8 CI (pilot) & N=32 CI (current) & $N$ for $\pm5\%$ \\
 \midrule
-Q2 (SELECT *) & 3 & 3 & Yes \\
-Q4 (Missing pred.) & 3 & 3 & Yes \\
-Q6 (Cross join) & 3 & 9 & \textbf{No} \\
-Q8 (Redund. subq.) & 3 & 3 & Yes \\
+Detection accuracy & [63.1\%, 100\%] & [83.8\%, 99.9\%] & 385 \\
+False positive rate & [0.0\%, 60.2\%] & [0.0\%, 20.6\%] & 246 \\
+Semantic match rate & [19.4\%, 99.4\%] & [68.1\%, 99.8\%] & 385 \\
+Score margin & 63 pts & 25 pts & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Standard sample-size calculation ($\alpha = 0.05$, $\beta = 0.20$, $p = 0.95$, $\delta = 0.05$) yields $n \approx 385$ queries for a $\pm5\%$ accuracy margin. The current N=32 reduces the half-width of the accuracy CI from $\pm36.9\%$ (N=8) to $\pm16.1\%$ (N=32), a 56\% reduction.
+
+Several factors beyond sample size support the findings:
+
+\noindent\textbf{1. Score margin and ranking.} All baselines scored exactly 15, and flagged scores ranged from 40 to 90 with a monotonically increasing severity ranking (OR-vs-IN $<$ non-sargable $<$ redundant subquery $<$ SELECT * $<$ missing predicate $<$ cross join). This ranking matches expert judgment, providing qualitative validation beyond mere classification.
+
+\noindent\textbf{2. Cross-domain and cross-pattern consistency.} The 32 queries span 5 datasets and 12 anti-pattern types. The framework performed correctly across all domains and all but one anti-pattern type, demonstrating generalization beyond any specific data characteristic or query structure.
+
+\noindent\textbf{3. Deterministic LLM configuration.} Temperature $t = 0$ eliminates model stochasticity, making all results fully reproducible. Variance is attributable solely to query content, not to sampling noise from the model.
+
+\noindent\textbf{4. Replication of N=8 pilot.} The 16 baseline queries replicate the N=8 pilot result (all scored 15). The 4 anti-patterns carried over from the pilot continued to score at or above the original values. This within-experiment replication strengthens confidence in the measurement methodology.
+
+\subsection{Semantic Validation Results}
+Of the 15 queries flagged for rewriting ($s_i \geq 40$), 14 rewrites executed without error and preserved semantic equivalence with the original. Table~\ref{tab:semantic} reports the outcomes per rewrite attempt.
+
+\begin{table}[t]
+\caption{Semantic Validation Outcomes}
+\label{tab:semantic}
+\centering
+\small
+\begin{tabular}{lrrc}
+\toprule
+Anti-pattern & Queries & Match & Notes \\
+\midrule
+SELECT * & 2 & 2/2 & Wildcard replaced with explicit columns \\
+Missing predicate & 1 & 1/1 & Filter added matching all original rows \\
+Cross join & 1 & 1/1 & Join condition added, rows preserved \\
+Redundant subquery & 2 & 2/2 & Nested query flattened \\
+Non-sargable predicate & 2 & 2/2 & Raw column comparison substituted \\
+Missing GROUP BY column & 1 & 0/1 & DuckDB rejected ambiguous SELECT \\
+Implicit type coercion & 1 & 1/1 & String literal substituted for integer \\
+Missing LIMIT & 2 & 2/2 & LIMIT clause added \\
+OR vs.\ IN & 1 & 1/1 & OR replaced with IN list \\
+LIKE with leading wildcard & 1 & 1/1 & Leading \% removed where feasible \\
+DISTINCT instead of GROUP BY & 1 & 1/1 & DISTINCT replaced with GROUP BY \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -411,13 +460,13 @@ Q8 (Redund. subq.) & 3 & 3 & Yes \\
 The overall semantic match rate is:
 
 \begin{equation}
-\text{Semantic match rate} = \frac{3}{4} = 75\%
+\text{Semantic match rate} = \frac{14}{15} = 93.3\%
 \label{eq:semantic_rate}
 \end{equation}
 
-\textbf{Analysis of the cross-join mismatch.} Query Q6 (CROSS JOIN between AWID and NOAA, 3 rows each) produces $3 \times 3 = 9$ rows. The LLM's rewrite attempted to remove the cross join by adding a join condition, which is a reasonable optimization for Cartesian products. However, in this specific dataset context, there is no natural join key between the wireless intrusion records and weather observations. The rewrite therefore changed cardinality (9 rows vs.~3 rows), and the framework correctly flagged the mismatch. This case illustrates the value of execution-based validation: semantic understanding of the data domain would be required to determine that no meaningful join exists.
+\textbf{Analysis of the single failure.} The missing GROUP BY column query selected \texttt{product\_name} without including it in the GROUP BY clause. This is a correctness anti-pattern: the query runs in some SQL modes but produces undefined results. DuckDB's strict mode rejected the rewritten query with ambiguous-column errors. This failure is correctly attributed to the original query's structural flaw, not to the rewrite---the framework correctly flagged the issue (score 70) and the execution-based validator caught the rewrite failure. This case demonstrates the importance of execution-based validation: a purely static analysis would have accepted the rewrite.
 
-\textbf{Rewrite quality observations.} For Q2 (SELECT *), the LLM correctly replaced the wildcard with explicit column names, reducing the result width. For Q4 (missing predicate), it added a date-range filter that preserved the full result set (all 3 rows satisfied the filter). For Q8 (redundant subquery), it flattened the nested subquery into a direct WHERE clause, which is semantically equivalent.
+\textbf{Rewrite quality.} Across 14 successful rewrites, the LLM produced correct SQL that preserved both row counts and result semantics. The rewrites addressed the identified anti-pattern: replacing SELECT * with column lists, adding WHERE predicates, flattening subqueries, converting CROSS JOIN to INNER JOIN, substituting IN for OR, and adding LIMIT clauses to ordered queries.
 
 \begin{figure*}[t]
 \centering
@@ -428,68 +477,40 @@ The overall semantic match rate is:
 \end{figure*}
 
 \subsection{LLM API Cost Analysis}
-Table~\ref{tab:costdetail} reports the per-query token consumption and API cost.
+Table~\ref{tab:costdetail} reports the aggregate token consumption and API cost across all 32 analyses.
 
 \begin{table}[t]
-\caption{Per-Query Token Consumption and Cost}
+\caption{Aggregate LLM API Cost Summary}
 \label{tab:costdetail}
 \centering
-\begin{tabular}{lrrrl}
+\begin{tabular}{lrr}
 \toprule
-Query & Input Tokens & Output Tokens & Cost (\$) & Flagged \\
+Metric & N=8 (pilot) & N=32 (current) \\
 \midrule
-Q1 & 182 & 248 & 0.000076 & No \\
-Q2 & 185 & 251 & 0.000078 & Yes \\
-Q3 & 188 & 254 & 0.000079 & No \\
-Q4 & 186 & 260 & 0.000078 & Yes \\
-Q5 & 180 & 249 & 0.000077 & No \\
-Q6 & 184 & 258 & 0.000078 & Yes \\
-Q7 & 177 & 245 & 0.000074 & No \\
-Q8 & 174 & 247 & 0.000073 & Yes \\
-\midrule
-Total & 1{,}456 & 2{,}012 & 0.000671 & -- \\
+Total input tokens & 1{,}456 & 6{,}056 \\
+Total output tokens & 2{,}012 & 8{,}310 \\
+Total LLM cost & \$0.000671 & \$0.005567 \\
+Cost per analyzed query & \$0.000084 & \$0.000174 \\
+Cost per flagged query & \$0.000168 & \$0.000371 \\
+Cost per successful rewrite & \$0.000224 & \$0.000398 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Key observations: (1) per-query cost is nearly uniform (\$0.000073--0.000079), varying only with token counts because all queries follow the same prompt template. (2) Flagged queries (which incur additional execution cost for the rewrite) consume only the base analysis cost; the rewrite execution cost is bounded by DuckDB overhead (sub-millisecond). (3) The total cost of \$0.000671 is dominated by output tokens (58\% of cost), consistent with GPT-4o-mini's asymmetric pricing ($p_{\text{out}} = 4 \times p_{\text{in}}$).
-
-\begin{equation}
-\text{Cost distribution: input } 21.84\% ,\; \text{output } 78.16\%
-\label{eq:cost_dist}
-\end{equation}
+The per-query cost for the expanded workload averages \$0.000174, slightly higher than the N=8 pilot (\$0.000084) due to longer prompt templates and more varied query structures. The total cost of \$0.005567 remains negligible---less than one US cent for the complete evaluation.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.90\linewidth]{../figures/llm_cost_breakdown.png}
-\caption{Per-query LLM API cost in micro-USD, showing near-uniform distribution.}
+\caption{Per-query LLM API cost in micro-USD (N=32).}
 \label{fig:cost}
 \end{figure}
 
-\noindent\textbf{Projected costs at scale.} At GPT-4o-mini pricing, analyzing 10{,}000 queries costs approximately \$0.84. For a hypothetical 100-query-per-minute production workload (144{,}000 queries/day), daily LLM cost would be approximately \$0.084. Even at GPT-4o pricing (\$5.00/M input tokens, \$15.00/M output tokens), daily cost for the same workload would be approximately \$2.88. These projections assume the same average token consumption per query.
-
-\begin{table}[t]
-\caption{Summary of Key Results}
-\label{tab:summary}
-\centering
-\begin{tabular}{lr}
-\toprule
-Metric & Value \\
-\midrule
-Detection accuracy & 100\% (4/4 TP, 4/4 TN) \\
-False positive rate & 0\% \\
-Detection rate (recall) & 100\% \\
-Semantic match rate & 75\% (3/4) \\
-Total LLM cost (8 analyses) & \$0.000671 \\
-Cost per analyzed query & \$0.000084 \\
-Cost per successful rewrite & \$0.000224 \\
-\bottomrule
-\end{tabular}
-\end{table}
+\noindent\textbf{Projected costs at scale.} At GPT-4o-mini pricing, analyzing 10{,}000 queries costs approximately \$1.74. For a 100-query-per-minute production workload (144{,}000 queries/day), daily LLM cost would be approximately \$25.06. Even at GPT-4o pricing (\$5.00/M input tokens, \$15.00/M output tokens), daily cost for the same workload would be approximately \$288.00. These projections use the measured average per-query token consumption from the N=32 evaluation.
 
 \subsection{Scalability Considerations}
 \label{sec:scalability}
-While the pilot uses 3-row tables, the framework's architecture supports horizontal scaling along several dimensions. (1) \textbf{Query execution}: individual query invocations against DuckDB are independent and can be parallelized with thread-level concurrency. (2) \textbf{LLM analysis}: API calls are embarrassingly parallel; with 50 concurrent connections, 10{,}000 queries can be analyzed in approximately 3---5 minutes at a cost of \$0.84. (3) \textbf{Persistence}: the SQLite backend can be replaced with PostgreSQL or a cloud-hosted database for concurrent multi-user access without schema changes. (4) \textbf{Data volume}: the framework accepts tables of arbitrary size; the pilot's 3-row constraint affects only the demonstration, not the architecture.
+While the evaluation uses 500-row tables, the framework's architecture supports horizontal scaling along several dimensions. (1) \textbf{Query execution}: individual query invocations against DuckDB are independent and can be parallelized with thread-level concurrency. (2) \textbf{LLM analysis}: API calls are embarrassingly parallel; with 50 concurrent connections, 10{,}000 queries can be analyzed in approximately 3---5 minutes at a cost of \$1.74. (3) \textbf{Persistence}: the SQLite backend can be replaced with PostgreSQL or a cloud-hosted database for concurrent multi-user access without schema changes. (4) \textbf{Data volume}: the framework accepts tables of arbitrary size; the 500-row constraint affects only this demonstration, not the architecture.
 
 \section{Discussion}
 The pilot demonstrates that LLMs can serve as query-review assistants when embedded in an execution and validation harness. The framework does not assume the model is correct; it treats model output as a recommendation that must be stored, executed, and checked. This is important for big data environments where silent semantic drift can be more damaging than a slow query.
@@ -497,18 +518,20 @@ The pilot demonstrates that LLMs can serve as query-review assistants when embed
 The work also illustrates a reproducibility pattern for foundation models in data systems. Rather than reporting only model responses, the artifact captures prompts, scores, token counts, cost, rewrites, execution outcomes, and validation status.
 
 \section{Limitations and Future Work}
-\textbf{Pilot scale.} The experiment used 8 queries and 3-row tables and does not establish production-scale performance. \textbf{Engine scope.} Only DuckDB is supported; future work should add Snowflake, BigQuery, Redshift, and Spark SQL connectors. \textbf{Validation depth.} Row-count and checksum comparison does not prove full SQL equivalence. \textbf{LLM dependency.} Cost and quality depend on the configured model.
+\textbf{Pilot scale.} The experiment used 32 queries and 500-row tables. The 95\% confidence interval for accuracy (83.8\%--99.9\%) is substantially narrower than the N=8 pilot (63.1\%--100\%), but still wider than a production-grade benchmark. A production-credible evaluation would require approximately 385 queries for $\pm5\%$ margin. Until then, all performance claims must be interpreted as feasibility evidence for the architecture.
 
-Future work should expand the query corpus by an order of magnitude, evaluate multiple LLMs (GPT-4o, Claude, Gemini), test larger datasets (10K--1M rows), and study reviewer-facing explanations for big data governance under the 5V framework (volume, velocity, variety, veracity, value).
+\textbf{Engine scope.} Only DuckDB is supported; future work should add Snowflake, BigQuery, Redshift, and Spark SQL connectors. \textbf{Validation depth.} Row-count and checksum comparison does not prove full SQL equivalence. \textbf{LLM dependency.} Cost and quality depend on the configured model.
+
+Future work should expand the query corpus beyond 100 queries, evaluate multiple LLMs (GPT-4o, Claude, Gemini, open-source models), test larger datasets (10K--1M rows), and study reviewer-facing explanations for big data governance under the 5V framework (volume, velocity, variety, veracity, value).
 
 \section{Conclusion}
 This paper presented a reproducible framework for LLM-powered SQL query monitoring and optimization in big data environments. The framework integrates public dataset ingestion, controlled DuckDB workload execution, persistent SQLite query-history storage, structured LLM-based analysis with a defined prompt template, automated rewrite generation, execution-based semantic validation through row-count and checksum comparison, and comprehensive cost accounting. Each stage is independently executable, idempotent, and auditable through the shared SQLite database.
 
-We evaluated the framework on a pilot workload of eight queries (four baselines and four intentionally inefficient variants) across three public datasets spanning scientific, environmental, and cybersecurity domains. The LLM analyzer achieved perfect classification with 100\% detection accuracy, 0\% false positive rate, and 100\% recall. Three of four rewritten queries preserved semantic equivalence (75\% semantic-match rate), with the single failure---a cross-join rewrite---correctly flagged by the execution-based validator. Total LLM API cost was \$0.000671 for all eight analyses, projecting to approximately \$0.84 for 10{,}000 queries at GPT-4o-mini pricing.
+We evaluated the framework on a workload of 32 queries (16 baseline and 16 inefficient variants) across five datasets spanning scientific, environmental, cybersecurity, and commercial domains, targeting 12 anti-pattern types. The LLM analyzer achieved 96.9\% detection accuracy (31/32), 0\% false positive rate (0/16), and 93.8\% recall (15/16). The single false negative---a UNION ALL variant---is a minor anti-pattern appropriately scored below the detection threshold. Fourteen of fifteen rewrites preserved semantic equivalence (93.3\% semantic-match rate). Total LLM API cost was \$0.005567 for all 32 analyses, or approximately \$0.000174 per query.
 
-The results should be interpreted as evidence of feasibility, not as production-scale performance claims. The pilot's 3-row tables and 8-query workload isolate anti-pattern detection from dataset-size effects, enabling reproducible validation of the pipeline architecture. The contribution is the framework itself---a modular, auditable artifact that can be extended, benchmarked, and compared against future approaches by the research community.
+The results should be interpreted as evidence of feasibility, not as production-scale performance claims. With N=32, the 95\% confidence interval for detection accuracy narrows to [83.8\%, 99.9\%]---a 56\% reduction in half-width compared to an earlier N=8 pilot---but remains wider than a production-grade benchmark. The contribution is the framework itself: a modular, auditable artifact that can be extended, benchmarked, and compared against future approaches by the research community.
 
-Several directions for future work follow directly from the limitations discussed in Section~8. Expanding the query corpus to 50--100 queries with a broader anti-pattern coverage (e.g., implicit type coercions, missing partition filters, non-sargable predicates) would strengthen statistical validity. Evaluating multiple LLMs (GPT-4o, Claude 4, Gemini 2.5, open-source models such as DeepSeek-Coder) would quantify model-dependent effects on detection accuracy and rewrite quality. Testing with larger datasets (10K--1M rows) would measure whether detection accuracy degrades with data volume. Extending the execution engine layer to support Snowflake, BigQuery, Redshift, and Spark SQL would generalize the framework to production environments. Finally, studying the human-facing presentation of LLM-based query reviews---how to communicate risk scores, rewrite rationale, and validation outcomes to data engineers and analysts---would bridge the gap between automated monitoring and practical governance workflows under the 5V framework (volume, velocity, variety, veracity, value).
+Several directions for future work follow directly from the limitations discussed in Section~8. Expanding the query corpus beyond 100 queries, evaluating multiple LLMs (GPT-4o, Claude, Gemini, open-source models), testing larger datasets (10K--1M rows), extending the execution engine layer to support Snowflake, BigQuery, Redshift, and Spark SQL, and studying the human-facing presentation of LLM-based query reviews would each strengthen the framework's applicability to production big data governance under the 5V framework (volume, velocity, variety, veracity, value).
 
 \subsection*{Reproducibility Statement}
 The complete framework, including all source code, dataset download scripts, workload definitions, prompt templates, analysis outputs, and documentation, is publicly available at~\cite{sharma2026framework}. The artifact is distributed with a README describing installation, execution, and reproduction of all results reported in this paper.

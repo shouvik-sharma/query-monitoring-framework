@@ -75,6 +75,7 @@
 \citation{usgs2026earthquake}
 \citation{noaa2026ncei}
 \citation{awid2020github}
+\citation{raasveldt2020duckdb,graefe1993volcano}
 \citation{bress2025snowflake,gcpantipattern}
 \citation{openai2026models}
 \citation{sharma2026framework}
@@ -84,38 +85,41 @@
 \@writefile{toc}{\contentsline {section}{\numberline {V}Experimental Setup}{5}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Datasets}{5}{subsection.5.1}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Workload Design}{5}{subsection.5.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Anti-pattern Coverage in Workload}}{5}{table.5}\protected@file@percent }
+\newlabel{tab:antipatterns_coverage}{{V}{5}{Anti-pattern Coverage in Workload}{table.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Evaluation Methodology}{5}{subsection.5.3}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Workload Composition}}{5}{table.5}\protected@file@percent }
-\newlabel{tab:queries}{{V}{5}{Workload Composition}{table.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Experimental Environment}{5}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Per-Query Detection Results}}{6}{table.6}\protected@file@percent }
-\newlabel{tab:perquery}{{VI}{6}{Per-Query Detection Results}{table.6}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Aggregate Results Summary}}{6}{table.6}\protected@file@percent }
+\newlabel{tab:results_summary}{{VI}{6}{Aggregate Results Summary}{table.6}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Results}{6}{section.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Detection Performance}{6}{subsection.6.1}\protected@file@percent }
 \newlabel{eq:detection_results}{{13}{6}{Detection Performance}{equation.6.13}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Semantic Validation Results}{6}{subsection.6.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Statistical Considerations}{6}{subsection.6.2}\protected@file@percent }
+\newlabel{sec:statistical}{{\mbox  {VI-B}}{6}{Statistical Considerations}{subsection.6.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Confidence Intervals: N=8 vs.\ N=32}}{6}{table.7}\protected@file@percent }
+\newlabel{tab:intervals}{{VII}{6}{Confidence Intervals: N=8 vs.\ N=32}{table.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Semantic Validation Results}{6}{subsection.6.3}\protected@file@percent }
 \newlabel{eq:semantic_rate}{{14}{6}{Semantic Validation Results}{equation.6.14}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Semantic Validation Outcomes per Rewrite}}{6}{table.7}\protected@file@percent }
-\newlabel{tab:semantic}{{VII}{6}{Semantic Validation Outcomes per Rewrite}{table.7}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Per-Query Token Consumption and Cost}}{6}{table.8}\protected@file@percent }
-\newlabel{tab:costdetail}{{VIII}{6}{Per-Query Token Consumption and Cost}{table.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}LLM API Cost Analysis}{6}{subsection.6.3}\protected@file@percent }
-\newlabel{eq:cost_dist}{{15}{6}{LLM API Cost Analysis}{equation.6.15}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing perfect separation between classes.}}{7}{figure.2}\protected@file@percent }
-\newlabel{fig:detection}{{2}{7}{Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing perfect separation between classes}{figure.2}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.\nobreakspace  {}rewritten query runtime (sub-ms scale, dominated by measurement noise).}}{7}{figure.3}\protected@file@percent }
-\newlabel{fig:validation}{{3}{7}{Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.~rewritten query runtime (sub-ms scale, dominated by measurement noise)}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-query LLM API cost in micro-USD, showing near-uniform distribution.}}{7}{figure.4}\protected@file@percent }
-\newlabel{fig:cost}{{4}{7}{Per-query LLM API cost in micro-USD, showing near-uniform distribution}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}Scalability Considerations}{7}{subsection.6.4}\protected@file@percent }
-\newlabel{sec:scalability}{{\mbox  {VI-D}}{7}{Scalability Considerations}{subsection.6.4}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Summary of Key Results}}{7}{table.9}\protected@file@percent }
-\newlabel{tab:summary}{{IX}{7}{Summary of Key Results}{table.9}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing separation (N=32).}}{7}{figure.2}\protected@file@percent }
+\newlabel{fig:detection}{{2}{7}{Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing separation (N=32)}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Semantic Validation Outcomes}}{7}{table.8}\protected@file@percent }
+\newlabel{tab:semantic}{{VIII}{7}{Semantic Validation Outcomes}{table.8}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Aggregate LLM API Cost Summary}}{7}{table.9}\protected@file@percent }
+\newlabel{tab:costdetail}{{IX}{7}{Aggregate LLM API Cost Summary}{table.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}LLM API Cost Analysis}{7}{subsection.6.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Scalability Considerations}{7}{subsection.6.5}\protected@file@percent }
+\newlabel{sec:scalability}{{\mbox  {VI-E}}{7}{Scalability Considerations}{subsection.6.5}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{7}{section.7}\protected@file@percent }
 \citation{sharma2026framework}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{raasveldt2020duckdb}{1}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.\nobreakspace  {}rewritten query runtime (sub-ms scale, dominated by measurement noise).}}{8}{figure.3}\protected@file@percent }
+\newlabel{fig:validation}{{3}{8}{Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.~rewritten query runtime (sub-ms scale, dominated by measurement noise)}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-query LLM API cost in micro-USD (N=32).}}{8}{figure.4}\protected@file@percent }
+\newlabel{fig:cost}{{4}{8}{Per-query LLM API cost in micro-USD (N=32)}{figure.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Limitations and Future Work}{8}{section.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{8}{section.9}\protected@file@percent }
 \bibcite{sqlite2026}{2}
 \bibcite{sharma2026framework}{3}
 \bibcite{querylens}{4}
@@ -131,9 +135,6 @@
 \bibcite{keebo2023}{14}
 \bibcite{bress2025snowflake}{15}
 \bibcite{patterns2026}{16}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Limitations and Future Work}{8}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{8}{section.9}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{References}{8}{section*.2}\protected@file@percent }
 \bibcite{tpch}{17}
 \bibcite{tpcds}{18}
 \bibcite{leis2015job}{19}
@@ -143,3 +144,5 @@
 \bibcite{usgs2026earthquake}{23}
 \bibcite{noaa2026ncei}{24}
 \bibcite{awid2020github}{25}
+\bibcite{graefe1993volcano}{26}
+\@writefile{toc}{\contentsline {section}{References}{9}{section*.2}\protected@file@percent }

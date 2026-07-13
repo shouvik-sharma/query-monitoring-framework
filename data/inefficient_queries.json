@@ -2,18 +2,34 @@
   {
     "dataset": "usgs",
     "label": "USGS - SELECT * variant",
-    "query": "SELECT * FROM earthquakes",
+    "query": "SELECT * FROM earthquakes WHERE mag > 4.0",
     "is_baseline": false,
     "inefficiency_type": "select_star",
     "expected_issue": "Unnecessary column selection"
   },
   {
     "dataset": "usgs",
-    "label": "USGS - No filter variant",
+    "label": "USGS - Missing predicate (full scan)",
     "query": "SELECT place, mag, time FROM earthquakes ORDER BY mag DESC",
     "is_baseline": false,
     "inefficiency_type": "missing_predicate",
     "expected_issue": "Full table scan without filters"
+  },
+  {
+    "dataset": "usgs",
+    "label": "USGS - Non-sargable YEAR() predicate",
+    "query": "SELECT place, mag, time FROM earthquakes WHERE YEAR(time) = 2024 ORDER BY mag DESC LIMIT 20",
+    "is_baseline": false,
+    "inefficiency_type": "non_sargable",
+    "expected_issue": "Function on indexed column prevents index seek"
+  },
+  {
+    "dataset": "usgs",
+    "label": "USGS - DISTINCT instead of GROUP BY",
+    "query": "SELECT DISTINCT place, mag FROM earthquakes ORDER BY mag DESC",
+    "is_baseline": false,
+    "inefficiency_type": "distinct_group",
+    "expected_issue": "DISTINCT used where GROUP BY is more appropriate"
   },
   {
     "dataset": "noaa",
@@ -21,14 +37,94 @@
     "query": "SELECT w1.STATION, w1.TMP, w2.TMP AS TMP2\nFROM weather w1, weather w2",
     "is_baseline": false,
     "inefficiency_type": "cross_join",
-    "expected_issue": "Unintended cross join"
+    "expected_issue": "Unintended Cartesian product"
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - Missing LIMIT on ordered query",
+    "query": "SELECT STATION, DATE, TMP FROM weather WHERE TMP > 25.0 ORDER BY TMP DESC",
+    "is_baseline": false,
+    "inefficiency_type": "missing_limit",
+    "expected_issue": "Unbounded result set from missing LIMIT"
+  },
+  {
+    "dataset": "noaa",
+    "label": "NOAA - Implicit type coercion",
+    "query": "SELECT STATION, DATE, TMP FROM weather WHERE STATION = 10010099999 AND TMP > 25.0",
+    "is_baseline": false,
+    "inefficiency_type": "implicit_coercion",
+    "expected_issue": "Type mismatch forces implicit conversion"
   },
   {
     "dataset": "awid",
     "label": "AWID - Nested subquery variant",
-    "query": "SELECT * FROM (\n            SELECT * FROM wifi_network WHERE radiotap_dbm_antsignal > -70\n        ) AS t WHERE radiotap_dbm_antsignal > -60",
+    "query": "SELECT * FROM (\n    SELECT * FROM wifi_network WHERE radiotap_dbm_antsignal > -70\n) AS t WHERE radiotap_dbm_antsignal > -60",
     "is_baseline": false,
     "inefficiency_type": "redundant_subquery",
-    "expected_issue": "Redundant filtering"
+    "expected_issue": "Redundant nested query"
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - OR instead of IN",
+    "query": "SELECT wlan_sa, class, radiotap_dbm_antsignal\nFROM wifi_network\nWHERE class = 'normal' OR class = 'attack' OR class = 'unknown'\nORDER BY radiotap_dbm_antsignal",
+    "is_baseline": false,
+    "inefficiency_type": "or_vs_in",
+    "expected_issue": "Multiple OR conditions instead of IN list"
+  },
+  {
+    "dataset": "awid",
+    "label": "AWID - LIKE with leading wildcard",
+    "query": "SELECT wlan_sa, class FROM wifi_network WHERE wlan_sa LIKE '%:ff'",
+    "is_baseline": false,
+    "inefficiency_type": "like_prefix",
+    "expected_issue": "Leading wildcard prevents index usage"
+  },
+  {
+    "dataset": "products",
+    "label": "Products - SELECT * with full scan",
+    "query": "SELECT * FROM products",
+    "is_baseline": false,
+    "inefficiency_type": "select_star",
+    "expected_issue": "Unnecessary column selection"
+  },
+  {
+    "dataset": "products",
+    "label": "Products - Missing GROUP BY column",
+    "query": "SELECT product_name, category, COUNT(*) AS cnt FROM products GROUP BY category",
+    "is_baseline": false,
+    "inefficiency_type": "missing_group_col",
+    "expected_issue": "GROUP BY does not include all non-aggregate columns"
+  },
+  {
+    "dataset": "products",
+    "label": "Products - Non-sargable string function",
+    "query": "SELECT product_name, price, category FROM products WHERE LOWER(category) = 'electronics' ORDER BY price DESC LIMIT 20",
+    "is_baseline": false,
+    "inefficiency_type": "non_sargable",
+    "expected_issue": "Function on indexed column prevents index seek"
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - UNION instead of UNION ALL",
+    "query": "SELECT order_id, total_amount FROM orders WHERE status = 'pending'\nUNION\nSELECT order_id, total_amount FROM orders WHERE status = 'shipped'\nORDER BY total_amount DESC LIMIT 30",
+    "is_baseline": false,
+    "inefficiency_type": "union_all",
+    "expected_issue": "UNION instead of UNION ALL (no duplicate removal needed)"
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - Redundant subquery wrapping",
+    "query": "SELECT * FROM (\n    SELECT order_id, customer_id, total_amount, order_date\n    FROM orders WHERE total_amount > 100.0\n) AS t WHERE total_amount > 200.0",
+    "is_baseline": false,
+    "inefficiency_type": "redundant_subquery",
+    "expected_issue": "Redundant nested query"
+  },
+  {
+    "dataset": "orders",
+    "label": "Orders - Missing LIMIT with ORDER BY",
+    "query": "SELECT order_id, customer_id, total_amount FROM orders ORDER BY total_amount DESC",
+    "is_baseline": false,
+    "inefficiency_type": "missing_limit",
+    "expected_issue": "Unbounded result set from missing LIMIT"
   }
 ]

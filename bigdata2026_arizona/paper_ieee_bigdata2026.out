@@ -23,10 +23,11 @@
 \BOOKMARK [2][-]{subsection.5.4}{Experimental Environment}{section.5}% 23
 \BOOKMARK [1][-]{section.6}{Results}{}% 24
 \BOOKMARK [2][-]{subsection.6.1}{Detection Performance}{section.6}% 25
-\BOOKMARK [2][-]{subsection.6.2}{Semantic Validation Results}{section.6}% 26
-\BOOKMARK [2][-]{subsection.6.3}{LLM API Cost Analysis}{section.6}% 27
-\BOOKMARK [2][-]{subsection.6.4}{Scalability Considerations}{section.6}% 28
-\BOOKMARK [1][-]{section.7}{Discussion}{}% 29
-\BOOKMARK [1][-]{section.8}{Limitations and Future Work}{}% 30
-\BOOKMARK [1][-]{section.9}{Conclusion}{}% 31
-\BOOKMARK [1][-]{section*.2}{References}{}% 32
+\BOOKMARK [2][-]{subsection.6.2}{Statistical Considerations}{section.6}% 26
+\BOOKMARK [2][-]{subsection.6.3}{Semantic Validation Results}{section.6}% 27
+\BOOKMARK [2][-]{subsection.6.4}{LLM API Cost Analysis}{section.6}% 28
+\BOOKMARK [2][-]{subsection.6.5}{Scalability Considerations}{section.6}% 29
+\BOOKMARK [1][-]{section.7}{Discussion}{}% 30
+\BOOKMARK [1][-]{section.8}{Limitations and Future Work}{}% 31
+\BOOKMARK [1][-]{section.9}{Conclusion}{}% 32
+\BOOKMARK [1][-]{section*.2}{References}{}% 33
