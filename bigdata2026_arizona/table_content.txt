@@ -1,0 +1,16 @@
+\begin{table}[t]
+\caption{Target Anti-pattern Taxonomy}
+\label{tab:antipatterns}
+\centering
+\small
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{p{0.20\linewidth}p{0.35\linewidth}p{0.45\linewidth}}
+\toprule
+Anti-pattern & Formal Characterization & Expected Impact \\
+\midrule
+SELECT * & Projects all columns when only a subset is needed & More I/O, wider shuffle, higher memory use \\
+Missing predicate & Scans all rows without a filter condition & Full scan, excess I/O \\
+Cross join & Joins tables without a join predicate & Cartesian product, many intermediate rows \\
+Redundant subquery & Wraps a simple query in unnecessary nesting & Blocks predicate pushdown \\
+\bottomrule
+\end{tabular}}

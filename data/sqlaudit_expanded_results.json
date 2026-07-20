@@ -1,0 +1,1797 @@
+{
+  "results": [
+    {
+      "label": "USGS - Large earthquakes by magnitude",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "USGS - Recent California earthquakes",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P003",
+          "severity": "warning",
+          "message": "Leading wildcard in LIKE pattern: '%CA%'",
+          "suggestion": "Use full-text search or restructure the query to avoid leading wildcards"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "like_prefix"
+      ]
+    },
+    {
+      "label": "USGS - Shallow earthquake count by region",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - High temperature stations",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Average temperature by station",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Days with large pressure drops",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Strong signal devices",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Normal traffic by MAC prefix",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Attack signal distribution",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Products - Top-selling items",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Products - Average price by category",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Products - Low stock alerts",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - High-value recent orders",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Monthly revenue summary",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Top customers by spend",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Pending high-value orders",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "USGS - SELECT * variant",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "select_star",
+      "expected_issue": "Unnecessary column selection",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star",
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Missing predicate (full scan)",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "missing_predicate",
+      "expected_issue": "Full table scan without filters",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Non-sargable YEAR() predicate",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "non_sargable",
+      "expected_issue": "Function on indexed column prevents index seek",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function YEAR() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "USGS - DISTINCT instead of GROUP BY",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "distinct_group",
+      "expected_issue": "DISTINCT used where GROUP BY is more appropriate",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - Cross join variant",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "cross_join",
+      "expected_issue": "Unintended Cartesian product",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - Missing LIMIT on ordered query",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "missing_limit",
+      "expected_issue": "Unbounded result set from missing LIMIT",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - Implicit type coercion",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "implicit_coercion",
+      "expected_issue": "Type mismatch forces implicit conversion",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "AWID - Nested subquery variant",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "redundant_subquery",
+      "expected_issue": "Redundant nested query",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star"
+      ]
+    },
+    {
+      "label": "AWID - OR instead of IN",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "or_vs_in",
+      "expected_issue": "Multiple OR conditions instead of IN list",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P006",
+          "severity": "info",
+          "message": "Multiple OR conditions on same column  --  use IN (...) instead",
+          "suggestion": "Use IN (...) instead of multiple OR conditions"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "or_vs_in"
+      ]
+    },
+    {
+      "label": "AWID - LIKE with leading wildcard",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "like_prefix",
+      "expected_issue": "Leading wildcard prevents index usage",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P003",
+          "severity": "warning",
+          "message": "Leading wildcard in LIKE pattern: '%:ff'",
+          "suggestion": "Use full-text search or restructure the query to avoid leading wildcards"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "like_prefix"
+      ]
+    },
+    {
+      "label": "Products - SELECT * with full scan",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "select_star",
+      "expected_issue": "Unnecessary column selection",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star",
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Missing GROUP BY column",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "missing_group_col",
+      "expected_issue": "GROUP BY does not include all non-aggregate columns",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Products - Non-sargable string function",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "non_sargable",
+      "expected_issue": "Function on indexed column prevents index seek",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function LOWER() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "Orders - UNION instead of UNION ALL",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "union_all",
+      "expected_issue": "UNION instead of UNION ALL (no duplicate removal needed)",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "S006",
+          "severity": "warning",
+          "message": "UNION after string literal  --  possible injection pattern",
+          "suggestion": "Use parameterized queries to prevent UNION-based injection"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Redundant subquery wrapping",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "redundant_subquery",
+      "expected_issue": "Redundant nested query",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star"
+      ]
+    },
+    {
+      "label": "Orders - Missing LIMIT with ORDER BY",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "missing_limit",
+      "expected_issue": "Unbounded result set from missing LIMIT",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Magnitude distribution",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "USGS - Deep earthquakes",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "USGS - Recent earthquakes by location",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function NOW() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "USGS - Earthquake frequency by month",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "USGS - High magnitude earthquakes",
+      "dataset": "usgs",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Temperature range by station",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - High humidity days",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Pressure variation",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Recent weather readings",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function NOW() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "NOAA - Temperature trends",
+      "dataset": "noaa",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Signal strength distribution",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Device activity by class",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "AWID - Strong signal attacks",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - MAC prefix analysis",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Signal strength by class",
+      "dataset": "awid",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Category statistics",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - High value items",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Products - Stock levels",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Price distribution",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Recent inventory",
+      "dataset": "products",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Customer order frequency",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Revenue by status",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 98,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - High value customers",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Monthly order count",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "Orders - Average order value",
+      "dataset": "orders",
+      "is_baseline": true,
+      "inefficiency_type": null,
+      "expected_issue": "",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - SELECT * variant",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "select_star",
+      "expected_issue": "Unnecessary column selection",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star",
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "AWID - SELECT * with filter",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "select_star",
+      "expected_issue": "Unnecessary column selection",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star",
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - SELECT * variant",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "select_star",
+      "expected_issue": "Unnecessary column selection",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star",
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - Missing predicate (full scan)",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "missing_predicate",
+      "expected_issue": "Full table scan without filters",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "AWID - Missing predicate (full scan)",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "missing_predicate",
+      "expected_issue": "Full table scan without filters",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Missing predicate (full scan)",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "missing_predicate",
+      "expected_issue": "Full table scan without filters",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Cross join variant",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "cross_join",
+      "expected_issue": "Unintended Cartesian product",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - Cross join variant",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "cross_join",
+      "expected_issue": "Unintended Cartesian product",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - Cross join variant",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "cross_join",
+      "expected_issue": "Unintended Cartesian product",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Redundant subquery variant",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "redundant_subquery",
+      "expected_issue": "Redundant nested query",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star"
+      ]
+    },
+    {
+      "label": "NOAA - Redundant subquery variant",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "redundant_subquery",
+      "expected_issue": "Redundant nested query",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star"
+      ]
+    },
+    {
+      "label": "Orders - Redundant subquery variant",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "redundant_subquery",
+      "expected_issue": "Redundant nested query",
+      "sqlaudit_score": 95,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P001",
+          "severity": "warning",
+          "message": "SELECT * found  --  specify columns explicitly",
+          "suggestion": "List specific columns instead of using SELECT *"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "select_star"
+      ]
+    },
+    {
+      "label": "NOAA - Non-sargable MONTH() predicate",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "non_sargable",
+      "expected_issue": "Function on indexed column prevents index seek",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function MONTH() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "AWID - Non-sargable SUBSTR() predicate",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "non_sargable",
+      "expected_issue": "Function on indexed column prevents index seek",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - Non-sargable YEAR() predicate",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "non_sargable",
+      "expected_issue": "Function on indexed column prevents index seek",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P008",
+          "severity": "warning",
+          "message": "Function YEAR() used in WHERE  --  may prevent index usage",
+          "suggestion": "Restructure to avoid applying functions to indexed columns"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "non_sargable"
+      ]
+    },
+    {
+      "label": "AWID - Missing LIMIT on ordered query",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "missing_limit",
+      "expected_issue": "Unbounded result set from missing LIMIT",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - OR instead of IN",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "or_vs_in",
+      "expected_issue": "Multiple OR conditions instead of IN list",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P006",
+          "severity": "info",
+          "message": "Multiple OR conditions on same column  --  use IN (...) instead",
+          "suggestion": "Use IN (...) instead of multiple OR conditions"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "or_vs_in"
+      ]
+    },
+    {
+      "label": "NOAA - OR instead of IN",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "or_vs_in",
+      "expected_issue": "Multiple OR conditions instead of IN list",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P006",
+          "severity": "info",
+          "message": "Multiple OR conditions on same column  --  use IN (...) instead",
+          "suggestion": "Use IN (...) instead of multiple OR conditions"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "or_vs_in"
+      ]
+    },
+    {
+      "label": "Products - OR instead of IN",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "or_vs_in",
+      "expected_issue": "Multiple OR conditions instead of IN list",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P006",
+          "severity": "info",
+          "message": "Multiple OR conditions on same column  --  use IN (...) instead",
+          "suggestion": "Use IN (...) instead of multiple OR conditions"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "or_vs_in"
+      ]
+    },
+    {
+      "label": "USGS - LIKE with leading wildcard",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "like_prefix",
+      "expected_issue": "Leading wildcard prevents index usage",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P003",
+          "severity": "warning",
+          "message": "Leading wildcard in LIKE pattern: '%CA%'",
+          "suggestion": "Use full-text search or restructure the query to avoid leading wildcards"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "like_prefix"
+      ]
+    },
+    {
+      "label": "Products - LIKE with leading wildcard",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "like_prefix",
+      "expected_issue": "Leading wildcard prevents index usage",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P003",
+          "severity": "warning",
+          "message": "Leading wildcard in LIKE pattern: '%Widget%'",
+          "suggestion": "Use full-text search or restructure the query to avoid leading wildcards"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "like_prefix"
+      ]
+    },
+    {
+      "label": "Orders - LIKE with leading wildcard",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "like_prefix",
+      "expected_issue": "Leading wildcard prevents index usage",
+      "sqlaudit_score": 94,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P003",
+          "severity": "warning",
+          "message": "Leading wildcard in LIKE pattern: '%pending%'",
+          "suggestion": "Use full-text search or restructure the query to avoid leading wildcards"
+        },
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit",
+        "like_prefix"
+      ]
+    },
+    {
+      "label": "USGS - Implicit type coercion",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "implicit_coercion",
+      "expected_issue": "Type mismatch forces implicit conversion",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "AWID - Implicit type coercion",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "implicit_coercion",
+      "expected_issue": "Type mismatch forces implicit conversion",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - Implicit type coercion",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "implicit_coercion",
+      "expected_issue": "Type mismatch forces implicit conversion",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - DISTINCT instead of GROUP BY",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "distinct_group",
+      "expected_issue": "DISTINCT used where GROUP BY is more appropriate",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - DISTINCT instead of GROUP BY",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "distinct_group",
+      "expected_issue": "DISTINCT used where GROUP BY is more appropriate",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Orders - DISTINCT instead of GROUP BY",
+      "dataset": "orders",
+      "is_baseline": false,
+      "inefficiency_type": "distinct_group",
+      "expected_issue": "DISTINCT used where GROUP BY is more appropriate",
+      "sqlaudit_score": 97,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        },
+        {
+          "rule_id": "P010",
+          "severity": "info",
+          "message": "ORDER BY without LIMIT sorts entire result set",
+          "suggestion": "Add LIMIT to ORDER BY queries for better performance"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - UNION instead of UNION ALL",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "union_all",
+      "expected_issue": "UNION instead of UNION ALL (no duplicate removal needed)",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "NOAA - UNION instead of UNION ALL",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "union_all",
+      "expected_issue": "UNION instead of UNION ALL (no duplicate removal needed)",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "Products - UNION instead of UNION ALL",
+      "dataset": "products",
+      "is_baseline": false,
+      "inefficiency_type": "union_all",
+      "expected_issue": "UNION instead of UNION ALL (no duplicate removal needed)",
+      "sqlaudit_score": 99,
+      "sqlaudit_findings": [
+        {
+          "rule_id": "P007",
+          "severity": "hint",
+          "message": "SELECT without LIMIT  --  consider adding LIMIT for bounded results",
+          "suggestion": "Add a LIMIT clause to prevent unbounded result sets"
+        }
+      ],
+      "sqlaudit_flags": true,
+      "sqlaudit_any_finding": true,
+      "detected_types": [
+        "missing_limit"
+      ]
+    },
+    {
+      "label": "USGS - Missing GROUP BY column",
+      "dataset": "usgs",
+      "is_baseline": false,
+      "inefficiency_type": "missing_group_col",
+      "expected_issue": "GROUP BY does not include all non-aggregate columns",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "NOAA - Missing GROUP BY column",
+      "dataset": "noaa",
+      "is_baseline": false,
+      "inefficiency_type": "missing_group_col",
+      "expected_issue": "GROUP BY does not include all non-aggregate columns",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    },
+    {
+      "label": "AWID - Missing GROUP BY column",
+      "dataset": "awid",
+      "is_baseline": false,
+      "inefficiency_type": "missing_group_col",
+      "expected_issue": "GROUP BY does not include all non-aggregate columns",
+      "sqlaudit_score": 100,
+      "sqlaudit_findings": [],
+      "sqlaudit_flags": false,
+      "sqlaudit_any_finding": false,
+      "detected_types": []
+    }
+  ],
+  "metrics_strict": {
+    "accuracy": 0.45054945054945056,
+    "precision": 0,
+    "recall": 0.0,
+    "f1": 0,
+    "fpr": 0.0,
+    "tp": 0,
+    "fp": 0,
+    "tn": 41,
+    "fn": 50
+  },
+  "metrics_any": {
+    "accuracy": 0.8461538461538461,
+    "precision": 0.8214285714285714,
+    "recall": 0.92,
+    "f1": 0.8679245283018867,
+    "fpr": 0.24390243902439024,
+    "tp": 46,
+    "fp": 10,
+    "tn": 31,
+    "fn": 4
+  }
+}

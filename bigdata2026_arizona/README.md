@@ -30,4 +30,4 @@ https://www.ieee.org/conferences/publishing/templates.html
 
 - IEEE BigData 2026 is single-blind, so author identity and repository URL can remain visible.
 - Full paper limit is 10 IEEE two-column pages including references.
-- Replace `Email: TODO` in the LaTeX author block before submission.
+- Author affiliation in the manuscript is K. J. Somaiya College of Engineering, India.

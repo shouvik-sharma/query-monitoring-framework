@@ -23,7 +23,7 @@
 
 **LLM-Powered Query Monitoring Framework**: A lightweight, reproducible system that:
 
-1. **Ingests** public datasets (USGS, NOAA, AWID) into queryable tables
+1. **Ingests** public datasets (USGS, NOAA, AWID, UCI Online Retail) into queryable tables
 2. **Executes** controlled SQL workloads against DuckDB
 3. **Analyzes** each query with an LLM (GPT-4o-mini) for risk scoring
 4. **Rewrites** inefficient queries with optimized SQL
@@ -39,17 +39,20 @@
 
 | Metric | Result |
 |--------|--------|
-| **Detection Accuracy** | 100% (4/4 inefficient queries identified) |
-| **False Positive Rate** | 0% (all baselines correctly passed) |
-| **Semantic Match Rate** | 75% (3/4 rewrites preserved exact results) |
-| **Total LLM API Cost** | $0.000671 USD |
-| **Queries Evaluated** | 8 (4 baseline, 4 inefficient) |
+| **Detection Accuracy** | 96.9% (31/32 queries classified correctly) |
+| **False Positive Rate** | 0.0% (0/16 baselines flagged) |
+| **Recall** | 93.8% (15/16 inefficient queries flagged) |
+| **Result-Equivalence Rate** | 93.3% (14/15 flagged rewrites preserved tested-instance results) |
+| **Total LLM API Cost** | $0.005522 USD |
+| **Queries Evaluated** | 32 (16 baseline, 16 inefficient) |
 
 **Anti-patterns tested:**
 - `SELECT *` (unnecessary column projection)
 - `missing_predicate` (full table scan without filters)
 - `cross_join` (unintended Cartesian product)
 - `redundant_subquery` (nested query overhead)
+- `non_sargable`, `missing_group_col`, `implicit_coercion`, `missing_limit`
+- `or_vs_in`, `union_all`, `like_prefix`, `distinct_group`
 
 ---
 
@@ -63,7 +66,7 @@
 **Why LLMs are the answer:**
 - GPT-4o-mini understands SQL semantics without training data
 - No ML pipeline overhead
-- Cost per analysis: ~$0.000084 per query
+- Cost per analysis: ~$0.000173 per query in the current 32-query benchmark
 
 **Why this framework is unique:**
 - Fully reproducible using public datasets and open-source tooling
@@ -102,19 +105,19 @@ Report Generator
 | Metric | Value |
 |--------|-------|
 | Average baseline risk score | 15.0/100 |
-| Average inefficient risk score | 71.2/100 |
-| Separation margin | 56.2 points |
+| Average inefficient risk score | 57.2/100 |
+| Separation margin | 42.2 points |
 
 ### Rewrite Performance
 
 | Query | Anti-Pattern | Original | Rewritten | Delta | Semantic |
 |:------|:-------------|:---------|:----------|:------|:---------|
-| USGS - SELECT * | select_star | 0.51ms | 0.65ms | -25.84% | Match |
-| USGS - No filter | missing_predicate | 1.01ms | 1.52ms | -50.12% | Match |
-| NOAA - Cross join | cross_join | 2.35ms | 1.60ms | +31.82% | Mismatch |
-| AWID - Nested subquery | redundant_subquery | 1.21ms | 2.04ms | -68.18% | Match |
+| USGS - DISTINCT instead of GROUP BY | distinct_group | 7.09ms | 5.14ms | +27.52% | Match |
+| NOAA - Cross join variant | cross_join | 272.67ms | 248.87ms | +8.73% | Match |
+| AWID - Nested subquery variant | redundant_subquery | 5.36ms | 2.48ms | +53.76% | Match |
+| Products - Missing GROUP BY column | missing_group_col | 2.55ms | 2.49ms | +2.38% | Mismatch |
 
-> **Caution:** Sub-millisecond measurements reflect Python-to-DuckDB overhead, not query-engine execution cost. The structural value of each rewrite (eliminated cross join, explicit column projection, WHERE predicate) should be evaluated at warehouse scale.
+> **Caution:** Measurements use 500-row in-memory DuckDB tables. Millisecond-level differences are useful as instrumentation checks, not production-speedup claims.
 
 ---
 
@@ -122,9 +125,9 @@ Report Generator
 
 | Feature | Our Framework | Rule-Based Systems | Manual Review |
 |---------|:-------------|:-------------------|:--------------|
-| **Auto-detect anti-patterns** | Yes (100% accuracy) | Limited (known patterns) | No |
+| **Auto-detect anti-patterns** | Yes (96.9% accuracy) | Limited (known patterns) | No |
 | **Semantic validation** | Yes (automated) | No | Manual |
-| **Cost to run** | $0.000084/query | Infrastructure cost | Engineer hours |
+| **Cost to run** | ~$0.000173/query | Infrastructure cost | Engineer hours |
 | **Reproducible** | Yes (public data) | Varies | No |
 | **Open source** | Yes | Rarely | N/A |
 
@@ -156,12 +159,13 @@ Report Generator
 
 ## Key Numbers (For Pitches)
 
-- **100%** detection accuracy
+- **96.9%** detection accuracy
 - **0%** false positives
-- **75%** semantic match rate
-- **$0.000671** total LLM cost (8 queries)
-- **4** SQL anti-patterns tested
-- **3** public datasets
+- **93.8%** recall
+- **93.3%** tested-instance result-equivalence rate
+- **$0.005522** total LLM cost (32 queries)
+- **12** SQL anti-pattern types tested
+- **5** logical datasets
 - **100%** open source
 
 ---

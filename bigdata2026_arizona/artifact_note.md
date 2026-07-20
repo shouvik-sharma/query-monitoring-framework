@@ -14,13 +14,13 @@ Artifact contents:
 - `scripts/execute_query_workload.py`: DuckDB workload execution.
 - `scripts/llm_analysis.py`: LLM scoring and recommendation generation.
 - `scripts/generate_report.py`: evaluation report generation.
-- `scripts/cost_analysis_report.py`: cost and semantic-match report generation.
+- `scripts/cost_analysis_report.py`: cost and result-equivalence report generation.
 - `scripts/reproduce.py`: end-to-end reproduction entry point.
 
 Reproducibility claim:
 
-- The current artifact reproduces a pilot-scale evaluation with 3 public datasets, 8 queries, 100% inefficient-query detection for the tested anti-patterns, 0% false positives on baseline queries, 75% semantic-match rate for rewrites, and $0.000671 total LLM API cost.
+- The current artifact reproduces an expanded pilot evaluation with 5 datasets, 32 queries, 96.9% detection accuracy, 0% false positives on baseline queries, 93.8% recall, 93.3% tested-instance result-equivalence rate for rewrites, and $0.005522 total LLM API cost.
 
 Important caveat:
 
-- The current experiment uses 3-row pilot tables. It is a reproducibility and governance artifact, not a production-scale performance benchmark.
+- The current experiment uses 500-row pilot tables. It is a reproducibility and governance artifact, not a production-scale performance benchmark.

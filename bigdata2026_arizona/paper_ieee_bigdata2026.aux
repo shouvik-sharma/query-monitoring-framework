@@ -19,19 +19,17 @@
 \citation{raasveldt2020duckdb}
 \citation{sqlite2026}
 \citation{sharma2026framework}
-\citation{querylens}
 \citation{sqlaudit}
 \citation{gcpantipattern}
 \citation{dwhauditor}
+\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}SQL Anti-pattern Detection and Static Analysis}{1}{subsection.2.1}\protected@file@percent }
 \citation{rbot2025}
 \citation{llmopt2025}
 \citation{llmsteer2024}
 \citation{lapuda2024}
 \citation{llm4hint2025}
-\@writefile{toc}{\contentsline {section}{\numberline {I}Introduction}{1}{section.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {II}Related Work}{1}{section.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-A}}SQL Anti-pattern Detection and Static Analysis}{1}{subsection.2.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}LLMs for SQL Optimization and Rewriting}{1}{subsection.2.2}\protected@file@percent }
 \citation{snowpatrol2023}
 \citation{keebo2023}
 \citation{bress2025snowflake}
@@ -41,108 +39,118 @@
 \citation{leis2015job}
 \citation{huo2025bird}
 \citation{yu2018spider}
+\citation{rbot2025,llmopt2025,llmsteer2024,lapuda2024,llm4hint2025}
+\citation{sqlaudit,gcpantipattern,dwhauditor}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-B}}LLMs for SQL Optimization and Rewriting}{2}{subsection.2.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-C}}Cloud Warehouse Monitoring and Governance}{2}{subsection.2.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-D}}Benchmarks for Reproducible Evaluation}{2}{subsection.2.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {II-E}}Gap Statement}{2}{subsection.2.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {III}System Design and Methodology}{2}{section.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}System Overview and Data Flow}{2}{subsection.3.1}\protected@file@percent }
 \citation{openai2026models}
 \citation{bress2025snowflake,gcpantipattern}
+\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Rule-Based vs. LLM-Assisted Coverage}}{3}{table.1}\protected@file@percent }
+\newlabel{tab:rulebased}{{I}{3}{Rule-Based vs. LLM-Assisted Coverage}{table.1}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Six-stage pipeline architecture. Arrows indicate the primary data flow direction; each stage reads from and writes to the shared QueryHistoryStore.}}{3}{figure.1}\protected@file@percent }
 \newlabel{fig:architecture}{{1}{3}{Six-stage pipeline architecture. Arrows indicate the primary data flow direction; each stage reads from and writes to the shared QueryHistoryStore}{figure.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-A}}System Overview and Data Flow}{3}{subsection.3.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Target Anti-pattern Taxonomy}}{3}{table.2}\protected@file@percent }
+\newlabel{tab:antipatterns}{{II}{3}{Target Anti-pattern Taxonomy}{table.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-B}}Problem Formulation}{3}{subsection.3.2}\protected@file@percent }
 \newlabel{eq:exec}{{7}{3}{Problem Formulation}{equation.3.7}{}}
 \newlabel{eq:llm}{{8}{3}{Problem Formulation}{equation.3.8}{}}
-\newlabel{eq:sem}{{9}{3}{Problem Formulation}{equation.3.9}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {I}{\ignorespaces Target Anti-pattern Taxonomy}}{3}{table.1}\protected@file@percent }
-\newlabel{tab:antipatterns}{{I}{3}{Target Anti-pattern Taxonomy}{table.1}{}}
-\newlabel{eq:cost}{{10}{3}{Problem Formulation}{equation.3.10}{}}
-\newlabel{eq:benefit}{{11}{3}{Problem Formulation}{equation.3.11}{}}
-\newlabel{eq:detection}{{12}{3}{Problem Formulation}{equation.3.12}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Anti-pattern Taxonomy}{3}{subsection.3.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Pipeline Pseudocode}{3}{subsection.3.4}\protected@file@percent }
+\newlabel{eq:cost}{{9}{3}{Problem Formulation}{equation.3.9}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces LLM-Powered Query Monitoring Pipeline}}{4}{algorithm.1}\protected@file@percent }
 \newlabel{alg:pipeline}{{1}{4}{Pipeline Pseudocode}{algorithm.1}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {II}{\ignorespaces Architectural Components and Their Database Interactions}}{4}{table.2}\protected@file@percent }
-\newlabel{tab:components}{{II}{4}{Architectural Components and Their Database Interactions}{table.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Architectural Components}{4}{subsection.3.5}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Query History Schema}}{4}{table.3}\protected@file@percent }
-\newlabel{tab:schema}{{III}{4}{Query History Schema}{table.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-F}}Design Rationale}{4}{subsection.3.6}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {III}{\ignorespaces Architectural Components and Their Database Interactions}}{4}{table.3}\protected@file@percent }
+\newlabel{tab:components}{{III}{4}{Architectural Components and Their Database Interactions}{table.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-C}}Pipeline Pseudocode}{4}{subsection.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-D}}Architectural Components}{4}{subsection.3.4}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Query History Schema}}{4}{table.4}\protected@file@percent }
+\newlabel{tab:schema}{{IV}{4}{Query History Schema}{table.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {III-E}}Design Rationale}{4}{subsection.3.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {IV}Implementation}{4}{section.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-A}}Query History Schema}{4}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}LLM Analysis and Prompt Template}{4}{subsection.4.2}\protected@file@percent }
+\citation{chen2015online}
 \citation{usgs2026earthquake}
 \citation{noaa2026ncei}
 \citation{awid2020github}
-\citation{raasveldt2020duckdb,graefe1993volcano}
+\citation{chen2015online}
+\citation{chen2015online}
 \citation{bress2025snowflake,gcpantipattern}
-\citation{openai2026models}
-\citation{sharma2026framework}
-\@writefile{lot}{\contentsline {table}{\numberline {IV}{\ignorespaces Dataset Characteristics}}{5}{table.4}\protected@file@percent }
-\newlabel{tab:datasets}{{IV}{5}{Dataset Characteristics}{table.4}{}}
+\citation{bress2025snowflake,gcpantipattern}
+\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Dataset Characteristics}}{5}{table.5}\protected@file@percent }
+\newlabel{tab:datasets}{{V}{5}{Dataset Characteristics}{table.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-B}}LLM Analysis and Prompt Template}{5}{subsection.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {IV-C}}Execution and Validation}{5}{subsection.4.3}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {V}Experimental Setup}{5}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-A}}Datasets}{5}{subsection.5.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Anti-pattern Coverage in Workload}}{5}{table.6}\protected@file@percent }
+\newlabel{tab:antipatterns_coverage}{{VI}{5}{Anti-pattern Coverage in Workload}{table.6}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-B}}Workload Design}{5}{subsection.5.2}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {V}{\ignorespaces Anti-pattern Coverage in Workload}}{5}{table.5}\protected@file@percent }
-\newlabel{tab:antipatterns_coverage}{{V}{5}{Anti-pattern Coverage in Workload}{table.5}{}}
+\newlabel{sec:workload}{{\mbox  {V-B}}{5}{Workload Design}{subsection.5.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-C}}Evaluation Methodology}{5}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Experimental Environment}{5}{subsection.5.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {VI}{\ignorespaces Aggregate Results Summary}}{6}{table.6}\protected@file@percent }
-\newlabel{tab:results_summary}{{VI}{6}{Aggregate Results Summary}{table.6}{}}
+\citation{openai2026models}
+\citation{sharma2026framework}
+\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Aggregate Results Summary}}{6}{table.7}\protected@file@percent }
+\newlabel{tab:results_summary}{{VII}{6}{Aggregate Results Summary}{table.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {V-D}}Experimental Environment}{6}{subsection.5.4}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {VI}Results}{6}{section.6}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-A}}Detection Performance}{6}{subsection.6.1}\protected@file@percent }
-\newlabel{eq:detection_results}{{13}{6}{Detection Performance}{equation.6.13}{}}
+\newlabel{eq:detection_results}{{10}{6}{Detection Performance}{equation.6.10}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Confidence Intervals: N=8 vs.\ N=32}}{6}{table.8}\protected@file@percent }
+\newlabel{tab:intervals}{{VIII}{6}{Confidence Intervals: N=8 vs.\ N=32}{table.8}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-B}}Statistical Considerations}{6}{subsection.6.2}\protected@file@percent }
 \newlabel{sec:statistical}{{\mbox  {VI-B}}{6}{Statistical Considerations}{subsection.6.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VII}{\ignorespaces Confidence Intervals: N=8 vs.\ N=32}}{6}{table.7}\protected@file@percent }
-\newlabel{tab:intervals}{{VII}{6}{Confidence Intervals: N=8 vs.\ N=32}{table.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Semantic Validation Results}{6}{subsection.6.3}\protected@file@percent }
-\newlabel{eq:semantic_rate}{{14}{6}{Semantic Validation Results}{equation.6.14}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing separation (N=32).}}{7}{figure.2}\protected@file@percent }
 \newlabel{fig:detection}{{2}{7}{Left: LLM risk scores per query (green = baseline, red = inefficient, dashed line = $\tau =40$). Right: Score distribution showing separation (N=32)}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {VIII}{\ignorespaces Semantic Validation Outcomes}}{7}{table.8}\protected@file@percent }
-\newlabel{tab:semantic}{{VIII}{7}{Semantic Validation Outcomes}{table.8}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Aggregate LLM API Cost Summary}}{7}{table.9}\protected@file@percent }
-\newlabel{tab:costdetail}{{IX}{7}{Aggregate LLM API Cost Summary}{table.9}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {IX}{\ignorespaces Result Validation Outcomes}}{7}{table.9}\protected@file@percent }
+\newlabel{tab:semantic}{{IX}{7}{Result Validation Outcomes}{table.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-C}}Result Validation Results}{7}{subsection.6.3}\protected@file@percent }
+\newlabel{eq:result_rate}{{11}{7}{Result Validation Results}{equation.6.11}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-D}}LLM API Cost Analysis}{7}{subsection.6.4}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Scalability Considerations}{7}{subsection.6.5}\protected@file@percent }
-\newlabel{sec:scalability}{{\mbox  {VI-E}}{7}{Scalability Considerations}{subsection.6.5}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{7}{section.7}\protected@file@percent }
+\citation{sqlaudit}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.\nobreakspace  {}rewritten query runtime on 500-row in-memory DuckDB tables.}}{8}{figure.3}\protected@file@percent }
+\newlabel{fig:validation}{{3}{8}{Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.~rewritten query runtime on 500-row in-memory DuckDB tables}{figure.3}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {X}{\ignorespaces Aggregate LLM API Cost Summary}}{8}{table.10}\protected@file@percent }
+\newlabel{tab:costdetail}{{X}{8}{Aggregate LLM API Cost Summary}{table.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-query LLM API cost in micro-USD (N=32).}}{8}{figure.4}\protected@file@percent }
+\newlabel{fig:cost}{{4}{8}{Per-query LLM API cost in micro-USD (N=32)}{figure.4}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {XI}{\ignorespaces Rule-Based vs. LLM-Assisted Detection Comparison}}{8}{table.11}\protected@file@percent }
+\newlabel{tab:baseline_comparison}{{XI}{8}{Rule-Based vs. LLM-Assisted Detection Comparison}{table.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-E}}Scalability Considerations}{8}{subsection.6.5}\protected@file@percent }
+\newlabel{sec:scalability}{{\mbox  {VI-E}}{8}{Scalability Considerations}{subsection.6.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {\mbox  {VI-F}}Baseline Comparison: Rule-Based vs. LLM-Assisted Detection}{8}{subsection.6.6}\protected@file@percent }
+\newlabel{sec:baseline_comparison}{{\mbox  {VI-F}}{8}{Baseline Comparison: Rule-Based vs. LLM-Assisted Detection}{subsection.6.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {VII}Discussion}{9}{section.7}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {VIII}Limitations and Future Work}{9}{section.8}\protected@file@percent }
+\newlabel{sec:limitations}{{VIII}{9}{Limitations and Future Work}{section.8}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{9}{section.9}\protected@file@percent }
 \citation{sharma2026framework}
 \bibstyle{IEEEtran}
 \bibdata{references}
 \bibcite{raasveldt2020duckdb}{1}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.\nobreakspace  {}rewritten query runtime (sub-ms scale, dominated by measurement noise).}}{8}{figure.3}\protected@file@percent }
-\newlabel{fig:validation}{{3}{8}{Left: Validation outcomes per rewrite (green = match, red = mismatch). Right: Original vs.~rewritten query runtime (sub-ms scale, dominated by measurement noise)}{figure.3}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Per-query LLM API cost in micro-USD (N=32).}}{8}{figure.4}\protected@file@percent }
-\newlabel{fig:cost}{{4}{8}{Per-query LLM API cost in micro-USD (N=32)}{figure.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {VIII}Limitations and Future Work}{8}{section.8}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {IX}Conclusion}{8}{section.9}\protected@file@percent }
 \bibcite{sqlite2026}{2}
 \bibcite{sharma2026framework}{3}
-\bibcite{querylens}{4}
-\bibcite{sqlaudit}{5}
-\bibcite{gcpantipattern}{6}
-\bibcite{dwhauditor}{7}
-\bibcite{rbot2025}{8}
-\bibcite{llmopt2025}{9}
-\bibcite{llmsteer2024}{10}
-\bibcite{lapuda2024}{11}
-\bibcite{llm4hint2025}{12}
-\bibcite{snowpatrol2023}{13}
-\bibcite{keebo2023}{14}
-\bibcite{bress2025snowflake}{15}
-\bibcite{patterns2026}{16}
-\bibcite{tpch}{17}
-\bibcite{tpcds}{18}
-\bibcite{leis2015job}{19}
-\bibcite{huo2025bird}{20}
-\bibcite{yu2018spider}{21}
-\bibcite{openai2026models}{22}
+\bibcite{sqlaudit}{4}
+\bibcite{gcpantipattern}{5}
+\bibcite{dwhauditor}{6}
+\bibcite{rbot2025}{7}
+\bibcite{llmopt2025}{8}
+\bibcite{llmsteer2024}{9}
+\bibcite{lapuda2024}{10}
+\bibcite{llm4hint2025}{11}
+\bibcite{snowpatrol2023}{12}
+\bibcite{keebo2023}{13}
+\bibcite{bress2025snowflake}{14}
+\bibcite{patterns2026}{15}
+\bibcite{tpch}{16}
+\bibcite{tpcds}{17}
+\bibcite{leis2015job}{18}
+\bibcite{huo2025bird}{19}
+\bibcite{yu2018spider}{20}
+\bibcite{openai2026models}{21}
+\bibcite{chen2015online}{22}
 \bibcite{usgs2026earthquake}{23}
 \bibcite{noaa2026ncei}{24}
 \bibcite{awid2020github}{25}
-\bibcite{graefe1993volcano}{26}
-\@writefile{toc}{\contentsline {section}{References}{9}{section*.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{References}{10}{section*.2}\protected@file@percent }

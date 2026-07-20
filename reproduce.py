@@ -47,13 +47,13 @@ def main() -> None:
     print(f"   Python: {sys.version}")
 
     if not args.skip_datasets:
-        run_step("1/5", "maintain_datasets.py", "sync")
+        run_step("1/6", "maintain_datasets.py", "sync")
 
-    run_step("2/5", "create_db.py")
-    run_step("3/5", "create_query_workload.py")
-    run_step("4/5", "execute_query_workload.py")
-    run_step("5/5", "llm_analysis.py")
-    run_step("6/5", "generate_report.py")
+    run_step("2/6", "create_db.py")
+    run_step("3/6", "create_query_workload.py")
+    run_step("4/6", "execute_query_workload.py")
+    run_step("5/6", "llm_analysis.py")
+    run_step("6/6", "generate_report.py")
 
     print(f"\n{'='*60}")
     print(f"  Reproduction complete.")

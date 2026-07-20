@@ -4,20 +4,40 @@
       "name": "USGS Earthquake Feed",
       "source_url": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv",
       "local_path": "data/raw/usgs/all_month.csv",
-      "format": "csv"
+      "format": "csv",
+      "terms_url": "https://www.usgs.gov/policies-and-notices",
+      "citation": "U.S. Geological Survey, Earthquake Hazards Program, real-time earthquake feeds."
     },
     {
       "name": "NOAA Global Hourly Station Feed",
       "source_url": "https://www.ncei.noaa.gov/data/global-hourly/access/2024/01001099999.csv",
       "local_path": "data/raw/noaa/01001099999.csv",
-      "format": "csv"
+      "format": "csv",
+      "terms_url": "https://www.ncei.noaa.gov/access/metadata/landing-page/bin/iso?id=gov.noaa.ncdc:C00532",
+      "citation": "NOAA National Centers for Environmental Information (2001): Global Surface Hourly [station subset]. NOAA National Centers for Environmental Information. Accessed 2026-07-18."
     },
     {
       "name": "AWID Wi-Fi Intrusion Mirror",
       "source_url": "https://raw.githubusercontent.com/krishanuskr/AWID-Intrusion-Detection-System-2020/main/Dataset.zip",
       "local_path": "data/raw/kaggle_wifi/extracted/AWID.csv",
       "archive_path": "data/raw/kaggle_wifi/Dataset.zip",
-      "format": "csv"
+      "format": "csv",
+      "terms_url": "http://icsdweb.aegean.gr/awid/download.html",
+      "citation": "AWID-derived Wi-Fi intrusion dataset mirror. Redistribution terms could not be confirmed from the mirror; verify permission before public redistribution."
+    },
+    {
+      "name": "UCI Online Retail",
+      "source_url": "https://cdn.uci-ics-mlr-prod.aws.uci.edu/352/online%2Bretail.zip",
+      "local_path": "data/raw/uci_online_retail/Online Retail.xlsx",
+      "archive_path": "data/raw/uci_online_retail/online_retail.zip",
+      "format": "xlsx",
+      "license": "CC BY 4.0",
+      "terms_url": "https://archive.ics.uci.edu/ml/datasets/Online+Retail",
+      "citation": "Chen, D. (2015). Online Retail [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5BW33.",
+      "derived_tables": {
+        "products": "data/raw/uci_online_retail/products.csv",
+        "orders": "data/raw/uci_online_retail/orders.csv"
+      }
     }
   ]
 }

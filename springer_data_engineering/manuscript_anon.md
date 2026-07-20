@@ -4,7 +4,7 @@
 
 ## Abstract
 
-Manual SQL review does not scale in modern data warehouses. This paper presents a framework that uses large language models (LLMs) to identify inefficient or risky SQL queries, recommend optimized rewrites, and validate recommendations through automated correctness checks. The system ingests public datasets, executes a controlled query workload against DuckDB, stores execution metadata in a SQLite query history database, analyzes queries with an LLM, and validates rewrites through semantic comparison. In an evaluation across three public datasets and eight queries (four baseline and four intentionally inefficient variants), the framework achieved 100% detection accuracy for common SQL anti-patterns with zero false positives, a 75% semantic match rate across optimized rewrites, and a total LLM API cost of $0.000671. The evaluation used a 3-row version of each dataset to isolate detection behavior from volume effects. These results demonstrate that LLM-powered query guardrails can be evaluated transparently and reproducibly at pilot scale.
+Manual SQL review does not scale in modern data warehouses. This paper presents a framework that uses large language models (LLMs) to identify inefficient or risky SQL queries, recommend optimized rewrites, and validate recommendations through automated correctness checks. The system ingests public datasets, executes a controlled query workload against DuckDB, stores execution metadata in a SQLite query history database, analyzes queries with an LLM, and validates rewrites through semantic comparison. In an evaluation across five logical datasets and 32 queries (16 baseline and 16 intentionally inefficient variants), the framework achieved 96.9% detection accuracy, 0.0% false positive rate, 93.8% recall, a 93.3% tested-instance result-equivalence rate across flagged rewrites, and a total LLM API cost of $0.005522. The evaluation used 500-row in-memory DuckDB tables to isolate detection and validation behavior. These results demonstrate that LLM-powered query guardrails can be evaluated transparently and reproducibly at pilot scale.
 
 ## 1. Introduction
 
@@ -60,15 +60,15 @@ Recommendations are not accepted purely on model output. The rewritten SQL is ex
 
 ## 4. Experimental Setup
 
-The experiment uses three public datasets: USGS earthquake records, NOAA weather records, and the AWID intrusion-detection dataset. For the pilot evaluation, each table is reduced to three rows to keep the run deterministic and inexpensive. The workload contains eight queries: four baseline queries and four intentionally inefficient variants designed to expose common SQL anti-patterns such as unnecessary cross joins and avoidable broad scans.
+The experiment uses five logical tables derived from public datasets: USGS earthquake records, NOAA weather records, AWID Wi-Fi traffic, UCI Online Retail products, and UCI Online Retail orders. For the pilot evaluation, each table is sampled to 500 rows to keep the run deterministic and inexpensive. The workload contains 32 queries: 16 baseline queries and 16 intentionally inefficient variants covering 12 SQL anti-pattern types.
 
 The reproducible pipeline is script-driven. Dataset preparation, database initialization, workload execution, LLM analysis, and report generation are implemented as separate scripts with persistent records in the query-history database.
 
 ## 5. Results
 
-The pilot run achieved 100% detection accuracy across the intentionally inefficient queries and produced zero false positives for the baseline queries. Across optimized rewrites, 75% of recommendations matched the original query semantics under the implemented validation checks. The total LLM API cost for the evaluated workload was $0.000671.
+The pilot run achieved 96.9% detection accuracy, 0.0% false positive rate, and 93.8% recall. Across flagged rewrites, 93.3% of recommendations preserved tested-instance row counts and result checksums under the implemented validation checks. The total LLM API cost for the evaluated workload was $0.005522.
 
-These results are intentionally reported at pilot scale. Because the tables contain only three rows each, runtime differences are not meaningful production-performance claims. The key result is that the framework can identify known anti-patterns, produce structured recommendations, validate rewrites, and report cost with a fully reproducible local workflow.
+These results are intentionally reported at pilot scale. Because the tables contain only 500 rows each, runtime differences are not meaningful production-performance claims. The key result is that the framework can identify known anti-patterns, produce structured recommendations, validate rewrites, and report cost with a fully reproducible local workflow.
 
 ## 6. Discussion
 
@@ -78,8 +78,8 @@ The current system is best viewed as an artifact for controlled experimentation 
 
 ## 7. Limitations
 
-- **Pilot-scale evaluation**: The experiment used only 3 rows per table to isolate detection behavior from volume effects; runtime deltas are dominated by measurement noise.
-- **Small query count**: Only 8 queries were evaluated (4 baseline and 4 intentionally inefficient). Larger query corpora are required for statistical confidence.
+- **Pilot-scale evaluation**: The experiment used 500 rows per table to isolate detection behavior from volume effects; runtime deltas are dominated by measurement noise.
+- **Small query count**: Only 32 queries were evaluated (16 baseline and 16 intentionally inefficient). Larger query corpora are required for statistical confidence.
 - **DuckDB-only runtime**: The execution engine currently targets DuckDB and does not yet support production systems such as Snowflake, BigQuery, Redshift, or PostgreSQL.
 - **SQLite query history**: SQLite is appropriate for the local artifact but is not designed for high-concurrency production telemetry.
 - **LLM dependency**: Cost, latency, and recommendation quality depend on the configured OpenAI model. Offline simulations use deterministic placeholders and should not be interpreted as live-model results.
@@ -87,7 +87,7 @@ The current system is best viewed as an artifact for controlled experimentation 
 
 ## 8. Conclusion
 
-This paper presents a framework for evaluating LLM-powered SQL query monitoring and optimization. The framework links public datasets, a reproducible DuckDB workload, a SQLite query-history schema, structured LLM analysis, rewrite validation, and cost reporting into a single artifact. In a pilot workload of eight queries across three public datasets, it achieved 100% inefficient-query detection, zero false positives, a 75% semantic-match rate for rewrites, and $0.000671 in total LLM API cost.
+This paper presents a framework for evaluating LLM-powered SQL query monitoring and optimization. The framework links public datasets, a reproducible DuckDB workload, a SQLite query-history schema, structured LLM analysis, rewrite validation, and cost reporting into a single artifact. In a pilot workload of 32 queries across five logical datasets, it achieved 96.9% detection accuracy, zero false positives, 93.8% recall, a 93.3% tested-instance result-equivalence rate for flagged rewrites, and $0.005522 in total LLM API cost.
 
 The results do not establish production-scale performance. Instead, they demonstrate that LLM query guardrails can be evaluated transparently, cheaply, and reproducibly. Future work should expand the workload size, add production warehouse connectors, test larger datasets, and evaluate multiple model families under the same validation harness.
 
@@ -105,7 +105,7 @@ The results do not establish production-scale performance. Instead, they demonst
 
 ## Appendix A: Dataset Manifest
 
-The artifact uses public external datasets from USGS, NOAA, and AWID. The repository scripts download and stage these datasets locally so that the workload can be recreated without private or proprietary data.
+The artifact uses public external datasets from USGS, NOAA, AWID, and UCI Online Retail. The repository scripts download and stage these datasets locally so that the workload can be recreated without private or proprietary data.
 
 ## Appendix B: Full Query History Schema
 

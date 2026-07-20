@@ -14,15 +14,6 @@
   year      = {2020}
 }
 
-@misc{duckdbdocs,
-  author       = {{DuckDB Foundation}},
-  title        = {DuckDB Documentation},
-  year         = {2026},
-  howpublished = {Online},
-  url          = {https://duckdb.org/docs/},
-  note         = {Accessed: 2026-07-12}
-}
-
 @misc{sqlite2026,
   author       = {{SQLite Consortium}},
   title        = {SQLite Documentation},
@@ -59,6 +50,15 @@
   note         = {Accessed: 2026-07-12}
 }
 
+@misc{chen2015online,
+  author       = {Chen, Daqing},
+  title        = {Online Retail},
+  year         = {2015},
+  howpublished = {UCI Machine Learning Repository},
+  doi          = {10.24432/C5BW33},
+  note         = {Accessed: 2026-07-18}
+}
+
 @misc{openai2026models,
   author       = {{OpenAI}},
   title        = {{GPT}-4o mini Documentation},
@@ -66,72 +66,6 @@
   howpublished = {Online},
   url          = {https://platform.openai.com/docs/models/gpt-4o-mini},
   note         = {Accessed: 2026-07-12}
-}
-
-@inproceedings{graefe1993volcano,
-  author    = {Graefe, G.},
-  title     = {The Volcano Optimizer Generator: Extensibility and Efficient Search},
-  booktitle = {Proc. IEEE Int. Conf. Data Eng. (ICDE)},
-  pages     = {209--218},
-  year      = {1993}
-}
-
-@article{chen2021evaluating,
-  author  = {Chen, M. and Tworek, J. and Jun, H. and others},
-  title   = {Evaluating Large Language Models Trained on Code},
-  journal = {arXiv:2107.03374},
-  year    = {2021}
-}
-
-@inproceedings{kraska2018case,
-  author    = {Kraska, T. and Beutel, A. and Chi, E. H. and Dean, J. and Polyzotis, N.},
-  title     = {The Case for Learned Index Structures},
-  booktitle = {Proc. ACM SIGMOD Int. Conf. Manage. Data},
-  pages     = {489--504},
-  year      = {2018}
-}
-
-@article{armbrust2021delta,
-  author  = {Armbrust, M. and Zaharia, M. and others},
-  title   = {Delta Lake: High-Performance {ACID} Table Storage over Cloud Object Stores},
-  journal = {Proc. VLDB Endow.},
-  volume  = {13},
-  number  = {12},
-  pages   = {3411--3424},
-  year    = {2020}
-}
-
-@article{zaharia2016apache,
-  author  = {Zaharia, M. and Xin, R. S. and Wendell, P. and others},
-  title   = {Apache Spark: A Unified Engine for Big Data Processing},
-  journal = {Commun. ACM},
-  volume  = {59},
-  number  = {11},
-  pages   = {56--65},
-  year    = {2016}
-}
-
-@article{li2023llmsql,
-  author  = {Li, J. and others},
-  title   = {Can {LLM} Already Serve as a Database Interface? A {BI} Benchmark Study},
-  journal = {arXiv:2305.03111},
-  year    = {2023}
-}
-
-@inproceedings{some2023cost,
-  author    = {Some, R. and Others, A.},
-  title     = {Cost-Based Query Optimization in the Age of Cloud Data Warehouses},
-  booktitle = {Proc. ACM SIGMOD Int. Conf. Manage. Data},
-  year      = {2023}
-}
-
-% --- New references for expanded Related Work ---
-
-@misc{querylens,
-  title        = {querylens: {SQL} Inspection {CLI}},
-  howpublished = {GitHub},
-  url          = {https://github.com/querylens/querylens},
-  note         = {Accessed: Jul. 2026}
 }
 
 @misc{sqlaudit,
@@ -205,11 +139,11 @@
   url          = {https://github.com/astronomer/snowpatrol}
 }
 
-@misc{keebo2023,
+@inproceedings{keebo2023,
   author  = {Keebo},
   title   = {Making Data Clouds Smarter: Automated Warehouse Optimization Using Data Learning},
+  booktitle = {Proc. ACM SIGMOD Int. Conf. Manage. Data},
   year    = {2023},
-  howpublished = {Proc. ACM SIGMOD}
 }
 
 @article{bress2025snowflake,
@@ -258,14 +192,7 @@
   author  = {Huo, N. and others},
   title   = {{BIRD-INTERACT}: Re-imagining {Text-to-SQL} Evaluation for Large Language Models via Dynamic Interactions},
   year    = {2025},
-  journal = {arXiv:2510.xxxxx}
-}
-
-@misc{bird2024bench,
-  author  = {Li, J. and others},
-  title   = {Can {LLM} Already Serve as a Database Interface? A {BI} Benchmark Study},
-  year    = {2024},
-  journal = {arXiv:2305.03111}
+  note    = {arXiv preprint}
 }
 
 @inproceedings{yu2018spider,
@@ -274,3 +201,4 @@
   booktitle = {Proc. Conf. Empirical Methods Natural Lang. Process. (EMNLP)},
   year      = {2018}
 }
+

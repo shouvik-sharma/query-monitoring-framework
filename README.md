@@ -11,17 +11,17 @@ Reproducible evaluation of LLM-based SQL query analysis and optimization.
 
 ## Overview
 
-This framework ingests public datasets, executes controlled SQL workloads, analyzes queries with an LLM (OpenAI GPT), generates optimized rewrites, and validates recommendations through automated semantic comparisons.
+This framework ingests public datasets, executes controlled SQL workloads, analyzes queries with an LLM (OpenAI GPT), generates optimized rewrites, and validates recommendations through execution-based result checks.
 
 ## Results
 
 | Metric | Value |
 |--------|-------|
-| Detection accuracy | 100% |
+| Detection accuracy | 96.9% |
 | False positive rate | 0% |
-| Semantic match rate | 75% |
-| Total LLM API cost | $0.000671 |
-| Queries evaluated | 8 (4 baseline, 4 inefficient) |
+| Result-equivalence rate | 93.3% |
+| Total LLM API cost | $0.005522 |
+| Queries evaluated | 32 (16 baseline, 16 inefficient) |
 
 Full report: `data/cost_analysis_report.md`
 
@@ -32,7 +32,8 @@ Full report: `data/cost_analysis_report.md`
 │   ├── raw/                  # Public dataset CSVs
 │   │   ├── usgs/             # USGS earthquake data
 │   │   ├── noaa/             # NOAA weather data
-│   │   └── kaggle_wifi/      # Wi-Fi network frames
+│   │   ├── kaggle_wifi/      # Wi-Fi network frames
+│   │   └── uci_online_retail/ # UCI Online Retail (products + orders)
 │   ├── query_history.db      # SQLite database (7 tables)
 │   ├── cost_analysis_report.md
 │   ├── query_workload.json
@@ -48,7 +49,7 @@ Full report: `data/cost_analysis_report.md`
 │   ├── generate_report.py    # Produce evaluation report
 │   └── cost_analysis_report.py   # CLI wrapper for report output
 ├── reproduce.py              # One-command reproduction script
-├── requirements.txt          # Python dependencies (duckdb, openai)
+├── requirements.txt          # Python dependencies (duckdb, openai, openpyxl)
 ├── research_progress.md      # Living session log
 ├── RESEARCH_PAPER.md         # Research paper draft
 ├── ARCHITECTURE.md           # System architecture
@@ -88,9 +89,9 @@ python reproduce.py
 ```
 
 This runs all six pipeline stages sequentially:
-1. Download public datasets (USGS, NOAA, AWID)
+1. Download public datasets (USGS, NOAA, AWID, UCI Online Retail)
 2. Initialize the query history database (schema from `schema/query_history_schema.sql`)
-3. Generate 8-query workload (4 baseline + 4 inefficient)
+3. Generate 32-query workload (16 baseline + 16 inefficient)
 4. Execute queries against DuckDB, store metrics
 5. Run LLM analysis + optimized rewrites
 6. Generate evaluation report
@@ -132,6 +133,14 @@ python scripts/generate_report.py
 | [USGS Earthquake Feed](https://earthquake.usgs.gov/) | 10,631 | Recent seismic events |
 | [NOAA Global Hourly](https://www.ncei.noaa.gov/) | 6,040 | Hourly weather readings |
 | [AWID Wi-Fi](https://github.com/krishanuskr/AWID-Intrusion-Detection-System-2020) | 211,190 | Network traffic frames |
+| [UCI Online Retail](https://archive.ics.uci.edu/ml/datasets/Online+Retail) | 541,909 | E-commerce transactions (products + orders) |
+
+### Dataset Terms and Attribution
+
+- USGS Earthquake Feed: U.S. Geological Survey public data feed; cite the USGS Earthquake Hazards Program.
+- NOAA Global Hourly: cite as "NOAA National Centers for Environmental Information (2001): Global Surface Hourly [station subset]. NOAA National Centers for Environmental Information."
+- UCI Online Retail: licensed under CC BY 4.0; cite Chen, D. (2015), Online Retail [Dataset], UCI Machine Learning Repository, https://doi.org/10.24432/C5BW33.
+- AWID Wi-Fi mirror: redistribution terms could not be confirmed from the GitHub mirror. Verify permission or replace this source before public archival redistribution.
 
 ## Database Schema
 
@@ -151,10 +160,18 @@ python scripts/generate_report.py
 - `missing_predicate` — Full table scan without filters
 - `cross_join` — Unintended Cartesian product
 - `redundant_subquery` — Layered nested query overhead
+- `non_sargable` — Functions around filter columns
+- `missing_group_col` — Invalid or ambiguous aggregation
+- `implicit_coercion` — Type mismatch in predicates
+- `missing_limit` — Unbounded sorted result sets
+- `or_vs_in` — Repeated OR predicates over one column
+- `union_all` — Duplicate-eliminating UNION where UNION ALL is sufficient
+- `like_prefix` — Leading-wildcard LIKE predicate
+- `distinct_group` — DISTINCT used where GROUP BY is clearer
 
 ## Limitations
 
-- Pilot-scale evaluation (3 rows per table) isolates detection/correctness from dataset effects; runtime deltas are measurement noise
+- Pilot-scale evaluation (500 rows per table) isolates detection/correctness from dataset effects; runtime deltas are still only indicative at this scale
 - Benchmark-only evaluation — not validated on production warehouses
 - SQLite for prototyping — not designed for production query volumes
 - Full CSV datasets (10k–211k records) are archived for replication at warehouse scale

@@ -336,3 +336,12 @@ Added MIT `LICENSE` file, `.gitignore` for Python/IDE/OS artifacts, and two- `da
 - Removed misleading "-28.08% average delta" headline from §6.2; replaced with structural-improvement framing.
 - Added complete LLM prompt template from `llm_analysis.py` into §4.2 for reproducibility.
 - Updated `data/cost_analysis_report.md` header and `README.md` limitations to be consistent with pilot-scale framing.
+
+**Session 15 — 2026-07-18**
+- Regenerated the full artifact pipeline with `python reproduce.py`: dataset sync, schema initialization, 32-query workload generation, original query execution, LLM/simulation analysis, rewrite validation, and Markdown report generation.
+- Regenerated chart artifacts with `python scripts/generate_charts.py`: detection accuracy, score distribution, semantic validation, runtime comparison, and LLM cost breakdown.
+- Regenerated `RESEARCH_PAPER.pdf` with `python scripts/generate_pdf.py` and verified figure references with `python scripts/verify_pdf.py`.
+- Updated rewrite validation so `scripts/llm_analysis.py` uses the same real-data DuckDB setup as `scripts/execute_query_workload.py`.
+- Updated `data/cost_analysis_report.md` to include pre-vs-post runtime columns for every flagged rewrite.
+- Current measured metrics: 32 queries, 16 baselines, 16 inefficient variants, 96.9% detection accuracy, 0.0% false positives, 93.8% recall, 93.3% tested-instance result-equivalence for flagged rewrites, and $0.005522 total LLM API cost.
+- Updated public-facing documentation (`README.md`, `RESEARCH_PAPER.md`, `EXECUTIVE_SUMMARY.md`, `AUTHOR_BIO.md`, `PUBLISH_GUIDE.md`, `CHANGELOG.md`, Springer draft, and BigData review notes) to match the regenerated 5-dataset, 500-row, 32-query results.

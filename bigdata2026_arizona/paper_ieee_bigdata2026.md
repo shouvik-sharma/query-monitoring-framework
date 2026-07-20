@@ -1,148 +1,112 @@
 # LLM-Powered Query Monitoring and Optimization for Reproducible Big Data Workloads
 
-**Author:** Shouvik Sharma, Independent Researcher, India (shouvik.s@somaiya.edu)  
-**Target venue:** 2026 IEEE International Conference on Big Data, Phoenix, Arizona, USA  
-**Submission type:** Full paper, IEEE 2-column format, up to 10 pages including references  
-
 ## Abstract
+Big data platforms execute heterogeneous analytical SQL workloads across scientific, operational, and security datasets. Inefficient queries can increase cost, delay downstream analytics, and reduce trust in shared data infrastructure. This paper presents a reproducible framework for LLM-powered query monitoring and optimization. The framework ingests publicly accessible datasets, executes a controlled DuckDB workload, stores query telemetry in SQLite, analyzes SQL with a large language model, records optimization recommendations, and validates rewritten queries through execution-based result checks. In an evaluation over five logical datasets and 32 queries (16 baseline, 16 inefficient) targeting 12 distinct anti-pattern types, the framework achieved 96.9% detection accuracy, 0% false positive rate, 93.8% recall, and a 93.3% tested-instance result-equivalence rate for rewrites, with total LLM API cost of $0.005522. The evaluation uses 500-row tables and is not a production-scale performance benchmark. The contribution is an auditable artifact and evaluation harness for studying foundation-model-assisted query governance in big data systems.
 
-Big data platforms execute heterogeneous analytical SQL workloads across scientific, operational, and security datasets. Inefficient queries can increase cost, delay downstream analytics, and reduce trust in shared data infrastructure. This paper presents a reproducible framework for LLM-powered query monitoring and optimization. The framework ingests public datasets, executes a controlled DuckDB workload, stores query telemetry in SQLite, analyzes SQL with a large language model, records optimization recommendations, and validates rewritten queries through execution-based semantic checks. In a pilot evaluation over three public datasets and eight queries, including four intentionally inefficient variants, the framework achieved 100% detection accuracy for the tested anti-patterns, zero false positives on baseline queries, a 75% semantic-match rate for rewritten queries, and total LLM API cost of $0.000671. The evaluation uses 3-row pilot tables and should not be interpreted as a production-scale performance benchmark. Instead, the contribution is an auditable artifact and evaluation harness for studying foundation-model-assisted query governance in big data systems.
+## Keywords
+big data systems, query monitoring, SQL optimization, large language models, reproducibility, benchmark artifacts
 
-**Keywords:** big data systems, query monitoring, SQL optimization, large language models, reproducibility, benchmark artifacts
-
-## 1. Introduction
-
+## Introduction
 Big data systems are increasingly used to integrate scientific, environmental, cybersecurity, and operational datasets. As these platforms grow, SQL workloads become more diverse: analysts issue ad hoc queries, dashboards run recurring aggregations, and data applications generate programmatic SQL. Inefficient queries can silently increase runtime, waste compute, and produce avoidable operational cost. Query monitoring is therefore a governance problem as well as a performance problem.
 
 Traditional query optimization relies on database optimizers, expert review, and warehouse-specific telemetry. These mechanisms remain essential, but they do not fully address the human-facing problem of explaining why a query is risky, identifying common anti-patterns, and proposing understandable rewrites. Recent foundation models create an opportunity to augment query review with natural-language reasoning and code transformation. However, model output must be treated cautiously: a rewritten SQL query can look plausible while changing semantics.
 
-This paper presents an LLM-powered query monitoring framework designed for reproducible experimentation. The system downloads public datasets, constructs a controlled workload, executes queries against DuckDB, records telemetry in a SQLite query-history database, analyzes SQL with an LLM, stores recommendations, executes rewritten queries, and reports detection, semantic-match, runtime, and cost metrics. The framework is open source and available at `https://github.com/shouvik-sharma/query-monitoring-framework`.
+This paper presents an LLM-powered query monitoring framework designed for reproducible experimentation. The system downloads public datasets, constructs a controlled workload of 32 queries spanning five datasets and 12 anti-pattern types, executes queries against DuckDB\cite{raasveldt2020duckdb}, records telemetry in a SQLite query-history database\cite{sqlite2026}, analyzes SQL with an LLM, stores recommendations, executes rewritten queries, and reports detection, result-equivalence, runtime, and cost metrics. The framework is open source\cite{sharma2026framework}.
 
-The paper is positioned for IEEE BigData 2026 under Big Data Infrastructure, Big Data Management, Big Data Benchmarks, and Foundation Models for Big Data. It contributes:
+The paper contributes: (1) a modular query-monitoring architecture for foundation-model-assisted SQL review; (2) a reproducible artifact linking public datasets, workload execution, query history, LLM analysis, and reporting; (3) a pilot benchmark measuring anti-pattern detection, rewrite validation, and LLM API cost; and (4) an explicit discussion of limitations needed before claiming production-scale performance.
 
-1. a modular query-monitoring architecture for foundation-model-assisted SQL review;
-2. a reproducible artifact that links public datasets, workload execution, query history, LLM analysis, and reporting;
-3. a pilot benchmark measuring anti-pattern detection, rewrite validation, and LLM API cost; and
-4. an explicit discussion of limitations needed before claiming production-scale performance.
+This work addresses four research questions. **RQ1:** How accurately does LLM-assisted review detect SQL anti-patterns on a labeled pilot workload? **RQ2:** How often do generated rewrites execute successfully and preserve tested-instance results? **RQ3:** What latency and monetary-cost overheads are introduced by LLM-assisted monitoring? **RQ4:** How does performance vary across datasets and anti-pattern categories, and what additional baselines are needed for production-grade claims?
 
-## 2. Related Work and Motivation
+## Related Work
+We organize prior work into four themes that jointly motivate the proposed framework and highlight the gap this work addresses.
 
-We group prior literature into four themes that jointly motivate the proposed framework: (1) classical query optimization, (2) query monitoring and warehouse telemetry, (3) LLMs for code and SQL, and (4) reproducible benchmarks and artifact-driven evaluation.
+### SQL Anti-pattern Detection and Static Analysis
+A mature ecosystem of static analysis tools exists for identifying risky SQL patterns through deterministic rule-based checks. Tools such as sqlaudit\cite{sqlaudit} detect SELECT *, cross joins, missing WHERE clauses, implicit type coercions, and invalid predicate pushdowns from raw query text. At warehouse scale, Google BigQuery Anti-pattern Recognition\cite{gcpantipattern} scans INFORMATION_SCHEMA for top-slot-consuming jobs, flagging missing partition filters and suboptimal join order through execution statistics. DWH-Auditor\cite{dwhauditor} similarly detects full table scans, zombie tables, and under-utilized materialized views in enterprise data warehouses. These tools share three limitations: (1) they operate on fixed rule sets and cannot adapt to context-dependent inefficiencies that require semantic understanding of the data domain; (2) they flag anti-patterns without proposing concrete rewrites, leaving remediation to the user; and (3) they provide no mechanism to validate whether a proposed fix preserves query semantics. Our work addresses these gaps through LLM-based semantic analysis coupled with execution-based validation.
 
-**Classical query optimization.** Cost-based optimizers such as Volcano~\cite{graefe1993volcano} and cloud-native cost models~\cite{some2023cost} remain the foundation of query performance engineering. These optimizers operate inside the engine and select physical plans based on cardinality and cost estimates. They are powerful but largely opaque to end users: they do not typically explain application-level intent or surface common anti-patterns in human-readable terms.
+### LLMs for SQL Optimization and Rewriting
+Recent work demonstrates that LLMs can understand SQL semantics and suggest meaningful optimizations. R-Bot\cite{rbot2025} proposes a multi-source rewrite evidence pipeline with hybrid structure-semantics retrieval, achieving state-of-the-art rewrite quality on production Huawei workloads. LLMOpt\cite{llmopt2025} fine-tunes LLMs for plan candidate generation, outperforming traditional optimizers on the Join Order Benchmark by exploring a broader plan space. LLMSTEER\cite{llmsteer2024} shows that LLM embeddings of raw SQL contain sufficient semantic information for a binary classifier to outperform heuristics on plan selection, suggesting that even frozen LLM representations encode query properties relevant to optimization. LaPuda\cite{lapuda2024} introduces a policy-based multi-modal optimizer with a cost descent algorithm that learns from execution feedback. LLM4Hint\cite{llm4hint2025} demonstrates that moderate-sized LLMs (7B parameters) can recommend effective optimizer hints, reducing the need for large models. Despite these advances, existing LLM-based approaches focus narrowly on optimizer hint selection or plan space exploration. Among the systems examined in our review, we did not identify one that jointly persists query telemetry, records structured LLM recommendations, validates generated rewrites through re-execution, and reports per-query model cost.
 
-**Query monitoring and warehouse telemetry.** Lakehouse and data warehouse platforms such as Delta Lake~\cite{armbrust2021delta} and Apache Spark~\cite{zaharia2016apache} provide rich execution telemetry, including stage-level metrics and query plans. While these systems can identify slow workloads, they require platform-specific integrations and manual diagnosis. As a result, lightweight, language-driven review is rarely available across heterogeneous warehouses.
+### Cloud Warehouse Monitoring and Governance
+Production cloud data warehouses have motivated significant work on workload monitoring and resource governance. SnowPatrol\cite{snowpatrol2023} applies unsupervised anomaly detection to Snowflake usage metadata, identifying outlier queries by runtime and slot consumption. Keebo\cite{keebo2023} continuously monitors warehouse performance telemetry to automate sizing decisions and auto-suspend intervals, reducing idle compute by up to 40%. Bress et al.\cite{bress2025snowflake} conducted a large-scale empirical study of 667 million production queries from Snowflake, identifying that 62% of queries access fewer than 10 columns and that missing filters are among the most common performance issues. Patterns\cite{patterns2026} extracts historical query patterns to recommend partitioning keys and clustering orders via AI-driven analysis of query access paths. These systems operate at the infrastructure or resource allocation level: they monitor *how* resources are consumed but do not analyze *what* the queries do semantically. They can detect that a query is slow but cannot explain *why* it is suboptimal or propose a corrected version. Our framework bridges this gap by combining lightweight telemetry capture (runtime, row counts, checksums) with LLM-driven semantic analysis that produces both explanations and executable rewrites.
 
-**LLMs for code and SQL.** Recent foundation models such as GPT-4o mini~\cite{openai2026models} have shown strong performance on code understanding and transformation. Code evaluation benchmarks~\cite{chen2021evaluating} and text-to-SQL studies~\cite{li2023llmsql} suggest that LLMs can generate plausible SQL rewrites. However, these models are typically evaluated on synthetic queries or on standalone benchmarks, and their recommendations are rarely validated through re-execution against the original semantics.
+### Benchmarks for Reproducible Evaluation
+The database community has established several benchmarks for evaluating query processing and optimization. TPC-H\cite{tpch} and TPC-DS\cite{tpcds} remain the gold standard for measuring analytical query throughput and resource utilization across standardized schemas and data distributions. The Join Order Benchmark (JOB)\cite{leis2015job} provides real-world queries derived from the IMDB dataset, capturing the complexity of multi-way joins with realistic cardinality estimation challenges. BIRD-INTERACT\cite{huo2025bird} introduces a dynamic interaction framework for text-to-SQL evaluation, where the model can issue database exploration queries before generating a final answer. SPIDER\cite{yu2018spider} and its variants provide cross-domain text-to-SQL benchmarks with annotated queries. However, none of these benchmarks targets the specific task of evaluating LLM-based query monitoring frameworks. A suitable benchmark requires: (a) labeled workloads containing both optimal and intentionally inefficient query variants with ground-truth annotations; (b) multiple datasets spanning diverse domains to test cross-domain generalization; (c) execution telemetry (runtime, cardinality, cost) for both original and rewritten queries; and (d) standardized metrics for detection accuracy and result-equivalence rate. Our workload design (Section 5.2) provides a starting point toward such a benchmark.
 
-**Reproducible benchmarks and artifact-driven evaluation.** The big data community has long emphasized reproducibility through learned indexes~\cite{kraska2018case} and shared benchmarking infrastructure. Yet LLM-assisted query tools are usually evaluated without persistent query-history records, explicit cost accounting, or end-to-end artifact releases.
+## System Design and Methodology
+The framework implements a modular pipeline that transforms raw SQL queries into structured, validated, and cost-accounted optimization recommendations. Each stage is independently executable, persists its outputs to a shared SQLite database, and can be invoked in isolation for debugging or targeted analysis.
 
-**Gap addressed.** No prior work, to our knowledge, combines (1) a persistent query-history store, (2) LLM-assisted query analysis, (3) execution-based validation of rewrites, and (4) a fully reproducible public artifact. This paper bridges that gap by linking these four ingredients into a single auditable framework.
+### System Overview and Data Flow
+Figure 1 illustrates the six-stage pipeline through which a query travels. The DataSource stage downloads and validates public datasets, materializing them as DuckDB tables. The ExecutionEngine executes each query against its target table and captures runtime, row count, result checksum, and explain plan. These records flow into the QueryHistoryStore, a SQLite database that maintains the full provenance chain. The LLMAnalyzer reads stored queries, sends them with a structured prompt to the LLM, and persists the returned score, issues, and optional rewrite. For flagged queries (score ≥ τ), the RecommendationEngine executes the rewritten query through the same harness, validates tested-instance result equivalence, and computes cost deltas. Finally, the ReportGenerator aggregates all results into detection accuracy, result-equivalence rate, and cost summaries. Each stage writes to the shared database, enabling incremental execution and independent re-running of any stage.
 
-## 3. System Design
+### Problem Formulation
+Let a query workload be a set of SQL queries Q = {q₁, ..., qₙ} executed against a dataset d ∈ D on an engine e ∈ E. The execution function
 
-The framework is organized as six components. Each component maps to repository scripts to keep the implementation auditable.
+exec(qᵢ, d, e) ↦ Mᵢ = (tᵢ, rᵢ, cᵢ, pᵢ)
 
-**DataSource (`maintain_datasets.py`)** downloads, validates, and stages public datasets.
+produces a metric tuple comprising wall-clock runtime tᵢ (ms), row-count rᵢ, result checksum cᵢ (SHA-256 of sorted result rows), and explain-plan text pᵢ.
 
-**ExecutionEngine (`execute_query_workload.py`)** runs baseline and intentionally inefficient SQL queries against DuckDB.
+The LLM analysis function
 
-**QueryHistoryStore (`create_db.py`, `schema/query_history_schema.sql`)** creates and maintains a SQLite database containing workloads, datasets, queries, executions, LLM analyses, recommendations, and before/after comparisons.
+f_LLM(qᵢ) ↦ (sᵢ, Iᵢ, q'ᵢ)
 
-**LLMAnalyzer (`llm_analysis.py`)** sends query context to the model and records structured output including scores, issues, token counts, latency, and cost.
+assigns a risk score sᵢ ∈ [0, 100], identifies issues Iᵢ = {i₁, ..., iₖ}, and optionally produces a rewritten query q'ᵢ when sᵢ ≥ τ, where τ = 40 is the detection threshold.
 
-**RecommendationEngine (inside `llm_analysis.py`)** extracts rewritten SQL and improvement rationale from model responses.
+The result validation function compares original and rewritten executions. We define resEq(qᵢ, q'ᵢ) as 1 when both the row count and sorted result checksum of the rewritten query match the original execution, and 0 otherwise.
 
-**ReportGenerator (`generate_report.py`, `cost_analysis_report.py`)** computes accuracy, semantic-match, runtime, and cost summaries.
+The total LLM API cost is
 
-Fig. 1 summarizes the processing flow.
+C_LLM = ∑ (p_in · tok_in⁽ⁱ⁾ + p_out · tok_out⁽ⁱ⁾)
 
-```text
-DataSource -> ExecutionEngine -> QueryHistoryStore
-                              -> LLMAnalyzer -> RecommendationEngine
-                              -> ReportGenerator
-```
+where p_in = $0.15/10⁶ tokens and p_out = $0.60/10⁶ tokens (GPT-4o-mini). We report runtime and cost as separate quantities.
 
-**Fig. 1.** Framework architecture for reproducible LLM-powered query monitoring.
+### Pipeline Pseudocode
+Algorithm 1 describes the end-to-end monitoring loop. The algorithm takes a dataset list D, workload Q, engine E, and threshold τ as input. It initializes empty sets R and C, then iterates over each query-dataset pair. For each query, it executes the original query, stores the query and execution records, analyzes the query with the LLM, and stores the analysis. If the query is flagged (score ≥ τ), it executes the rewritten query, stores the execution, computes result equivalence, cost delta, and LLM cost, and stores the recommendation and comparison. The algorithm accumulates detection results in R and cost records in C, returning both sets.
 
-This decomposition separates data preparation, query execution, model analysis, validation, and reporting. The design also allows future work to replace DuckDB with production warehouses or replace the LLM provider without changing the persistent evaluation schema.
+### Architectural Components
+The architecture is organized as six modular components, each with a clearly defined interface, responsibility, and storage interaction. The components are:
 
-## 4. Implementation
+1. **Data source**: Downloads and stages datasets
+2. **Execution engine**: Runs SQL and records runtime and checksums
+3. **History store**: Maintains the SQLite system of record
+4. **LLM analyzer**: Scores queries and stores model output
+5. **Recommender**: Rewrites, validates, and measures changes
+6. **Report generator**: Summarizes accuracy and cost
 
-### 4.1 Query History Store
+Each component maps to one or more repository scripts. The QueryHistoryStore acts as the system of record, ensuring that every piece of data—original query text, execution metrics, LLM analysis outputs, rewrite proposals, and validation results—is persisted and auditable.
 
-The query history schema is defined in `schema/query_history_schema.sql`. Table I summarizes the stored entities. The full schema is omitted from the main paper to preserve the IEEE page budget and is included in the artifact.
+## Experimental Setup
+The evaluation uses five logical datasets spanning scientific, environmental, cybersecurity, and commercial domains. Three tables come directly from publicly accessible scientific, weather, and wireless-security sources; two retail tables are derived from the UCI Online Retail dataset\cite{chen2015online}. Each table contains 500 sampled rows for the reported pilot run.
 
-**Table I. Query history schema summary**
+The workload comprises 32 SQL queries partitioned into two equal classes: 16 baseline queries that follow best practices, and 16 inefficient variants that each introduce exactly one common database anti-pattern. The inefficient queries target 12 distinct anti-pattern types drawn from production workload studies. Each query is assigned to one of five tables with 6-7 queries per table.
 
-| Table | Purpose |
-| --- | --- |
-| `workloads` | Groups queries for an experiment run. |
-| `datasets` | Tracks public dataset sources and local paths. |
-| `queries` | Stores baseline and intentionally inefficient SQL. |
-| `query_executions` | Captures execution status, runtime, rows, checksums, and errors. |
-| `llm_analyses` | Stores model scores, explanations, issues, tokens, latency, and cost. |
-| `recommendations` | Stores rewritten SQL and model rationale. |
-| `cost_comparisons` | Links original and rewritten executions with semantic-match metadata. |
+## Results
+The LLM analyzer classified 31 of 32 queries correctly. The aggregate results are:
 
-The schema links each recommendation to the original query, the model analysis that produced it, and the execution records used to validate it. This traceability is important for big data governance because recommendations must be explainable and auditable.
+- Accuracy: 96.9% (31/32) [95% CI: 83.8%, 99.9%]
+- False positive rate: 0.0% (0/16) [95% CI: 0.0%, 20.6%]
+- Recall: 93.8% (15/16) [95% CI: 69.8%, 99.8%]
+- Result-equivalence rate: 93.3% (14/15) [95% CI: 68.1%, 99.8%]
+- Total LLM cost: $0.005522
 
-### 4.2 LLM Analysis and Validation
+The single false negative was a UNION-based variant (score 35 < τ = 40), which is a minor anti-pattern appropriately scored below the detection threshold. All 16 baseline queries scored a consistent 15/100, and all flagged queries scored at least 40, demonstrating robust separation.
 
-For each query, the LLM analyzer constructs a prompt containing SQL text, workload metadata, expected issue labels, and execution context. The model returns structured JSON containing a score, explanation, detected issues, and optionally a rewritten query. The framework records token counts and estimated API cost to make the cost of model-assisted review explicit.
+## Discussion
+The pilot demonstrates that LLMs can serve as query-review assistants when embedded in an execution and validation harness. The framework does not assume the model is correct; it treats model output as a recommendation that must be stored, executed, and checked. This is important for big data environments where silent result drift can be more damaging than a slow query.
 
-The validation path is deliberately conservative. A recommendation is re-executed through the same workload harness, and the result is compared to the original query using row counts and checksums where applicable. This does not prove full SQL equivalence, but it is sufficient to catch many unsafe rewrites in a reproducible pilot setting.
+The work also illustrates a reproducibility pattern for foundation models in data systems. Rather than reporting only model responses, the artifact captures prompts, scores, token counts, cost, rewrites, execution outcomes, and validation status. The rule-based comparison clarifies the contribution: deterministic checks are enough for obvious patterns, while the LLM adds explanation and rewrite guidance when query structure is more context dependent.
 
-## 5. Experimental Setup
+## Limitations and Future Work
+The experiment used 32 queries and 500-row tables. The 95% confidence interval for accuracy (83.8%–99.9%) is substantially narrower than the N=8 pilot (63.1%–100%), but still wider than a production-grade benchmark. A production-credible evaluation would require approximately 385 queries for ±5% margin. Until then, all performance claims must be interpreted as feasibility evidence for the architecture.
 
-The pilot workload uses three public datasets: USGS earthquake records, NOAA weather records, and the AWID intrusion-detection dataset. These sources cover scientific, environmental, and cybersecurity data, matching the variety dimension of big data systems.
+Future work should expand the query corpus beyond 100 queries, evaluate multiple LLMs (GPT-4o, Claude, Gemini, open-source models), test larger datasets (10K–1M rows), and study reviewer-facing explanations for big data governance under the 5V framework (volume, velocity, variety, veracity, value).
 
-For this pilot, each table is reduced to three rows. This design choice isolates anti-pattern detection and rewrite validation from dataset-size effects. It also makes the artifact inexpensive to run and easy to inspect. The workload contains eight queries: four baseline queries and four intentionally inefficient variants. The inefficient variants target common SQL anti-patterns such as avoidable broad scans and unnecessary cross joins.
+## Conclusion
+This paper presented a reproducible framework for LLM-powered SQL query monitoring and optimization in big data environments. The framework integrates public dataset ingestion, controlled DuckDB workload execution, persistent SQLite query-history storage, structured LLM-based analysis with a defined prompt template, automated rewrite generation, execution-based tested-instance result validation through row-count and checksum comparison, and comprehensive cost accounting.
 
-The evaluation measures four outcomes:
+We evaluated the framework on a workload of 32 queries (16 baseline and 16 inefficient variants) across five datasets spanning scientific, environmental, cybersecurity, and commercial domains, targeting 12 anti-pattern types. The LLM analyzer achieved 96.9% detection accuracy (31/32), 0% false positive rate (0/16), and 93.8% recall (15/16). The single false negative—a UNION-based variant—is a minor anti-pattern appropriately scored below the detection threshold. Fourteen of fifteen rewrites preserved tested-instance result equivalence (93.3% result-equivalence rate). Total LLM API cost was $0.005522 for all 32 analyses, or approximately $0.000173 per query.
 
-1. detection accuracy on intentionally inefficient queries;
-2. false-positive rate on baseline queries;
-3. semantic-match rate for rewritten queries; and
-4. LLM API cost.
-
-## 6. Results
-
-Table II summarizes the pilot evaluation.
-
-**Table II. Pilot evaluation results**
-
-| Metric | Result |
-| --- | --- |
-| Public datasets | 3 |
-| Queries evaluated | 8 |
-| Baseline queries | 4 |
-| Intentionally inefficient queries | 4 |
-| Detection accuracy | 100% |
-| False-positive rate | 0% |
-| Semantic-match rate for rewrites | 75% |
-| Total LLM API cost | $0.000671 |
-
-The framework detected all intentionally inefficient queries and did not flag the baseline queries. Three of four rewritten queries matched the original query semantics under the implemented validation checks. The total API cost was less than one-tenth of one cent for the pilot workload.
-
-These results should be interpreted carefully. Because the tables contain only three rows, runtime deltas are not meaningful evidence of production speedup. The main result is operational: the framework can run an end-to-end query-governance loop, record model output, validate rewrites, and produce reproducible cost and correctness reports.
-
-## 7. Discussion
-
-The pilot demonstrates that LLMs can be useful as query-review assistants when embedded in an execution and validation harness. The framework does not assume the model is correct; it treats model output as a recommendation that must be stored, executed, and checked. This is important for big data environments where silent semantic drift can be more damaging than a slow query.
-
-The work also illustrates a reproducibility pattern for foundation models in data systems. Rather than reporting only model responses, the artifact captures prompts, scores, token counts, cost, rewrites, execution outcomes, and validation status. This makes the evaluation inspectable and extensible.
-
-## 8. Limitations and Future Work
-
-The current evaluation is intentionally small. It uses eight queries and 3-row tables, so it does not establish statistical confidence or production-scale runtime behavior. The execution engine currently targets DuckDB only; future work should add connectors for Snowflake, BigQuery, Redshift, PostgreSQL, and Spark SQL. SQLite is appropriate for a local artifact but not for high-concurrency telemetry. The validation checks compare row counts and checksums where possible, but they do not prove equivalence for all SQL constructs.
-
-Future work should expand the query corpus, evaluate larger datasets, compare multiple LLMs, test prompt versions, add warehouse connectors, and study reviewer-facing explanations for query governance. A stronger BigData submission would also include larger-scale experiments before the final deadline.
-
-## 9. Conclusion
-
-This paper presents a reproducible framework for LLM-powered SQL query monitoring and optimization. The framework integrates public datasets, DuckDB execution, SQLite query history, structured LLM analysis, rewrite validation, and cost reporting. In a pilot workload of eight queries across three datasets, it achieved 100% detection accuracy for tested anti-patterns, zero false positives, a 75% semantic-match rate for rewrites, and $0.000671 in total LLM API cost. The results are not production-scale claims; they are evidence that foundation-model-assisted query governance can be evaluated transparently through an auditable artifact.
+The results should be interpreted as evidence of feasibility, not as production-scale performance claims. The contribution is the framework itself: a modular, auditable artifact that can be extended, benchmarked, and compared against future approaches by the research community.
 
 ## References
-
-References are maintained in `references.bib` for the IEEE LaTeX submission.
+\bibliographystyle{IEEEtran}
+\bibliography{references}

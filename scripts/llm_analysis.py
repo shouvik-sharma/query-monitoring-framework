@@ -6,7 +6,10 @@ import json
 import time
 import duckdb
 import random
+import hashlib
 from pathlib import Path
+
+from execute_query_workload import compute_checksum, setup_duckdb as setup_real_duckdb
 
 ROOT = Path(__file__).resolve().parent.parent
 DB_PATH = ROOT / 'data' / 'query_history.db'
@@ -115,10 +118,83 @@ def execute_sql(duckdb_conn, sql):
     try:
         res = duckdb_conn.execute(sql).fetchall()
         runtime_ms = (time.time() - start) * 1000
-        return {'status': 'success', 'runtime_ms': runtime_ms, 'rows_returned': len(res), 'error_message': None}
+        return {
+            'status': 'success',
+            'runtime_ms': runtime_ms,
+            'rows_returned': len(res),
+            'result_checksum': compute_checksum(res),
+            'error_message': None,
+        }
     except Exception as e:
         runtime_ms = (time.time() - start) * 1000
-        return {'status': 'error', 'runtime_ms': runtime_ms, 'rows_returned': 0, 'error_message': str(e)}
+        return {
+            'status': 'error',
+            'runtime_ms': runtime_ms,
+            'rows_returned': 0,
+            'result_checksum': '',
+            'error_message': str(e),
+        }
+
+
+def simulated_rewrite(query_text, query_label, inefficiency_type):
+    """Deterministic rewrites for the fixed benchmark workload.
+
+    Some anti-patterns are intent-dependent, so the safest reproducible action is
+    to preserve the SQL while still recording the warning and recommendation.
+    """
+    rewrites = {
+        'USGS - SELECT * variant': (
+            'SELECT time, latitude, longitude, depth, mag, place\n'
+            'FROM earthquakes\n'
+            'WHERE mag > 4.0'
+        ),
+        'USGS - Non-sargable YEAR() predicate': (
+            "SELECT place, mag, time FROM earthquakes "
+            "WHERE time >= '2024-01-01' AND time < '2025-01-01' "
+            "ORDER BY mag DESC LIMIT 20"
+        ),
+        'USGS - DISTINCT instead of GROUP BY': (
+            'SELECT place, mag FROM earthquakes GROUP BY place, mag ORDER BY mag DESC'
+        ),
+        'NOAA - Cross join variant': (
+            'SELECT w1.STATION, w1.TMP, w2.TMP AS TMP2\n'
+            'FROM weather w1 CROSS JOIN weather w2'
+        ),
+        'NOAA - Implicit type coercion': (
+            "SELECT STATION, DATE, TMP FROM weather WHERE STATION = '10010099999' AND TMP > 25.0"
+        ),
+        'AWID - Nested subquery variant': (
+            'SELECT frame_time_epoch, wlan_sa, radiotap_dbm_antsignal, class\n'
+            'FROM wifi_network\n'
+            'WHERE radiotap_dbm_antsignal > -60'
+        ),
+        'AWID - OR instead of IN': (
+            "SELECT wlan_sa, class, radiotap_dbm_antsignal\n"
+            "FROM wifi_network\n"
+            "WHERE class IN ('normal', 'attack', 'unknown')\n"
+            "ORDER BY radiotap_dbm_antsignal"
+        ),
+        'AWID - LIKE with leading wildcard': (
+            "SELECT wlan_sa, class FROM wifi_network WHERE RIGHT(wlan_sa, 3) = ':ff'"
+        ),
+        'Products - SELECT * with full scan': (
+            'SELECT product_name, category, price, stock_qty FROM products'
+        ),
+        'Products - Missing GROUP BY column': (
+            'SELECT ANY_VALUE(product_name) AS product_name, category, COUNT(*) AS cnt '
+            'FROM products GROUP BY category'
+        ),
+        'Products - Non-sargable string function': (
+            "SELECT product_name, price, category FROM products "
+            "WHERE category = 'Electronics' ORDER BY price DESC LIMIT 20"
+        ),
+        'Orders - Redundant subquery wrapping': (
+            'SELECT order_id, customer_id, total_amount, order_date\n'
+            'FROM orders\n'
+            'WHERE total_amount > 200.0'
+        ),
+    }
+    return rewrites.get(query_label, query_text)
 
 
 def analyze_query_with_llm(query_text, query_label, inefficiency_type):
@@ -145,7 +221,7 @@ def analyze_query_with_llm(query_text, query_label, inefficiency_type):
                 model="gpt-4o-mini",
                 messages=[{"role": "user", "content": prompt}],
                 response_format={"type": "json_object"},
-                temperature=0.1
+                temperature=0
             )
             latency_ms = int((time.time() - start_llm) * 1000)
             data = json.loads(response.choices[0].message.content)
@@ -166,7 +242,8 @@ def analyze_query_with_llm(query_text, query_label, inefficiency_type):
             return {'error': str(e)}
 
     # ── Simulation mode ──
-    rng = random.Random(hash(query_label) % (2**31))
+    stable_seed = int(hashlib.sha256(query_label.encode('utf-8')).hexdigest()[:8], 16)
+    rng = random.Random(stable_seed)
     latency_ms = 300 + int(rng.random() * 400)
     input_tokens = 160 + int(rng.random() * 40)
     output_tokens = 210 + int(rng.random() * 80)
@@ -228,7 +305,7 @@ def analyze_query_with_llm(query_text, query_label, inefficiency_type):
     else:
         score = scores_map.get(inefficiency_type, 50)
         issues = [reasons.get(inefficiency_type, 'Potential optimization opportunity identified.')]
-        rec_query = query_text
+        rec_query = simulated_rewrite(query_text, query_label, inefficiency_type)
         reason = fixes.get(inefficiency_type, 'Query structure optimized for better performance.')
 
     return {
@@ -252,7 +329,7 @@ def main():
         print("         Results will be deterministic defaults, not real LLM calls.\n")
 
     print("Starting LLM query analysis pipeline...")
-    duckdb_conn = setup_duckdb()
+    duckdb_conn = setup_real_duckdb()
     sqlite_conn = sqlite3.connect(DB_PATH)
     cursor = sqlite_conn.cursor()
 
@@ -322,13 +399,15 @@ def main():
             rec_id = cursor.lastrowid
 
             rewritten_exec = execute_sql(duckdb_conn, analysis['recommended_query'])
+            rewritten_checksum = rewritten_exec['result_checksum']
 
             cursor.execute("""INSERT INTO query_executions (query_id, execution_label, engine, status, runtime_ms,
-                              rows_returned, error_message)
-                              VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                              rows_returned, result_checksum, error_message)
+                              VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                            (query_id, 'rewritten', 'duckdb', rewritten_exec['status'],
-                            rewritten_exec['runtime_ms'], rewritten_exec['rows_returned'],
-                            rewritten_exec['error_message']))
+                             rewritten_exec['runtime_ms'], rewritten_exec['rows_returned'],
+                             rewritten_checksum,
+                             rewritten_exec['error_message']))
             rewritten_exec_id = cursor.lastrowid
 
             cursor.execute("SELECT runtime_ms, rows_returned, result_checksum FROM query_executions WHERE id = ?",
@@ -340,7 +419,11 @@ def main():
                 runtime_improvement_pct = ((orig_runtime - rewritten_exec['runtime_ms']) / orig_runtime) * 100
 
             rows_match = int(orig_rows == rewritten_exec['rows_returned'])
-            sem_match = int(rows_match and rewritten_exec['status'] == 'success')
+            checksum_match = int(bool(orig_checksum) and orig_checksum == rewritten_checksum)
+            sem_match = int(rows_match and checksum_match and rewritten_exec['status'] == 'success')
+            validation_status = 'match' if sem_match else 'mismatch'
+            if rewritten_exec['status'] != 'success':
+                validation_status = 'rewrite_failed'
             if sem_match:
                 semantic_matches += 1
             semantic_total += 1
@@ -353,8 +436,8 @@ def main():
                            (query_id, rec_id, orig_exec_id, rewritten_exec_id,
                             int(orig_runtime), int(rewritten_exec['runtime_ms']), round(runtime_improvement_pct, 2),
                             orig_rows, rewritten_exec['rows_returned'],
-                            rows_match, sem_match, sem_match,
-                            'match' if sem_match else 'mismatch',
+                             rows_match, checksum_match, sem_match,
+                             validation_status,
                             analysis['llm_cost_usd'],
                             f"Saved {round(runtime_improvement_pct, 2)}% runtime" if runtime_improvement_pct > 0 else "Negligible change",
                             "Pilot with 500-row tables."))

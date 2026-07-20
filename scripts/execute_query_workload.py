@@ -1,11 +1,11 @@
 """Execute query workload and store results in query_history.db"""
 
+import csv
 import sqlite3
 import duckdb
 import json
 import time
 import hashlib
-import random
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,111 +13,141 @@ DB_PATH = ROOT / 'data' / 'query_history.db'
 QUERY_WORKLOAD_PATH = ROOT / 'data' / 'query_workload.json'
 DATASETS_DIR = ROOT / 'data' / 'raw'
 
-SEED = 42
 N_ROWS = 500
 
 
-def seeded_random():
-    rng = random.Random(SEED)
-    return rng
-
-
-def generate_data():
-    """Generate 500 rows for each of 5 tables using seeded random."""
-    rng = seeded_random()
-
-    # USGS Earthquakes
-    places = ['Los Angeles, CA', 'San Francisco, CA', 'New York, NY', 'Tokyo, Japan',
-              'Mexico City, Mexico', 'Anchorage, AK', 'Seattle, WA', 'Portland, OR',
-              'Reno, NV', 'Salt Lake City, UT', 'Phoenix, AZ', 'Denver, CO',
-              'Chicago, IL', 'Miami, FL', 'Honolulu, HI']
-    usgs = []
-    for i in range(N_ROWS):
-        ts = f"2024-{rng.randint(1,12):02d}-{rng.randint(1,28):02d} {rng.randint(0,23):02d}:{rng.randint(0,59):02d}:00"
-        lat = round(rng.uniform(20.0, 50.0), 4)
-        lon = round(rng.uniform(-125.0, -65.0), 4)
-        mag = round(rng.uniform(2.0, 7.5), 1)
-        depth = round(rng.uniform(1.0, 50.0), 1)
-        place = rng.choice(places)
-        usgs.append((ts, lat, lon, depth, mag, place))
-
-    # NOAA Weather (2 stations)
-    stations = ['01001099999', '01002099999']
-    noaa = []
-    for i in range(N_ROWS):
-        st = rng.choice(stations)
-        ts = f"2024-{rng.randint(1,12):02d}-{rng.randint(1,28):02d} {rng.randint(0,23):02d}:{rng.randint(0,59):02d}:00"
-        tmp = round(rng.uniform(5.0, 40.0), 1)
-        dew = round(tmp - rng.uniform(2.0, 10.0), 1)
-        slp = round(rng.uniform(995.0, 1025.0), 1)
-        noaa.append((st, ts, tmp, dew, slp))
-
-    # AWID Wi-Fi
-    mac_prefixes = ['00:11:22', 'aa:bb:cc', '11:22:33', '44:55:66', '77:88:99']
-    classes = ['normal', 'normal', 'normal', 'attack', 'unknown']
-    awid = []
-    for i in range(N_ROWS):
-        ts = f"2024-{rng.randint(1,12):02d}-{rng.randint(1,28):02d} {rng.randint(0,23):02d}:{rng.randint(0,59):02d}:00"
-        mac = f"{rng.choice(mac_prefixes)}:{rng.randint(10,99):02d}:{rng.randint(10,99):02d}:{rng.randint(10,99):02d}"
-        sig = rng.randint(-95, -20)
-        cls = rng.choice(classes)
-        awid.append((ts, mac, sig, cls))
-
-    # Products
-    categories = ['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Food']
-    product_adjectives = ['Premium', 'Basic', 'Pro', 'Ultra', 'Eco', 'Smart', 'Classic']
-    product_nouns = ['Widget', 'Gadget', 'Tool', 'Kit', 'Set', 'Pack', 'Device']
-    products = []
-    for i in range(N_ROWS):
-        cat = rng.choice(categories)
-        adj = rng.choice(product_adjectives)
-        noun = rng.choice(product_nouns)
-        name = f"{adj} {noun} {rng.randint(100,999)}"
-        price = round(rng.uniform(5.0, 2000.0), 2)
-        stock = rng.randint(0, 200)
-        products.append((name, cat, price, stock))
-
-    # Orders
-    statuses = ['pending', 'shipped', 'delivered', 'cancelled']
-    orders = []
-    for i in range(N_ROWS):
-        cid = rng.randint(1, 100)
-        ts = f"2024-{rng.randint(1,12):02d}-{rng.randint(1,28):02d}"
-        amt = round(rng.uniform(10.0, 2000.0), 2)
-        st = rng.choice(statuses)
-        orders.append((i + 1, cid, ts, amt, st))
-
-    return usgs, noaa, awid, products, orders
+def read_csv_sample(csv_path: Path, n_rows: int) -> list[tuple]:
+    """Read up to n_rows from a CSV file, returning list of tuples."""
+    rows = []
+    with csv_path.open("r", encoding="utf-8", errors="replace") as f:
+        reader = csv.reader(f)
+        header = next(reader, None)
+        for i, row in enumerate(reader):
+            if i >= n_rows:
+                break
+            rows.append(tuple(row))
+    return rows
 
 
 def setup_duckdb():
     conn = duckdb.connect()
-    rng = seeded_random()
 
-    usgs, noaa, awid, products, orders = generate_data()
+    # USGS Earthquakes from CSV (columns: time=0, latitude=1, longitude=2, depth=3, mag=4, place=13)
+    usgs_path = DATASETS_DIR / 'usgs' / 'all_month.csv'
+    if usgs_path.exists():
+        print(f"  Loading USGS data from {usgs_path.name}...")
+        raw = read_csv_sample(usgs_path, N_ROWS)
+        conn.execute("CREATE TABLE earthquakes (time TIMESTAMP, latitude FLOAT, longitude FLOAT, depth FLOAT, mag FLOAT, place VARCHAR)")
+        for row in raw:
+            try:
+                ts = row[0].replace("T", " ").replace("Z", "") if len(row) > 0 else ""
+                lat = float(row[1]) if len(row) > 1 and row[1] else 0.0
+                lon = float(row[2]) if len(row) > 2 and row[2] else 0.0
+                depth = float(row[3]) if len(row) > 3 and row[3] else 0.0
+                mag = float(row[4]) if len(row) > 4 and row[4] else 0.0
+                place = row[13] if len(row) > 13 else ""
+                conn.execute("INSERT INTO earthquakes VALUES (?, ?, ?, ?, ?, ?)", (ts, lat, lon, depth, mag, place))
+            except (ValueError, IndexError):
+                continue
+        n_usgs = conn.execute("SELECT COUNT(*) FROM earthquakes").fetchone()[0]
+    else:
+        print("  USGS CSV not found, creating empty table")
+        conn.execute("CREATE TABLE earthquakes (time TIMESTAMP, latitude FLOAT, longitude FLOAT, depth FLOAT, mag FLOAT, place VARCHAR)")
+        n_usgs = 0
 
-    # Earthquakes
-    conn.execute("CREATE TABLE earthquakes (time TIMESTAMP, latitude FLOAT, longitude FLOAT, depth FLOAT, mag FLOAT, place VARCHAR)")
-    conn.executemany("INSERT INTO earthquakes VALUES (?, ?, ?, ?, ?, ?)", usgs)
+    # NOAA Weather from CSV (columns: STATION=0, DATE=1, TMP=13, DEW=14, SLP=15)
+    noaa_path = DATASETS_DIR / 'noaa' / '01001099999.csv'
+    if noaa_path.exists():
+        print(f"  Loading NOAA data from {noaa_path.name}...")
+        raw = read_csv_sample(noaa_path, N_ROWS)
+        conn.execute("CREATE TABLE weather (STATION VARCHAR, DATE VARCHAR, TMP FLOAT, DEW FLOAT, SLP FLOAT)")
+        for row in raw:
+            try:
+                station = row[0] if len(row) > 0 else ""
+                date_val = row[1] if len(row) > 1 else ""
+                tmp_str = row[13] if len(row) > 13 else ""
+                dew_str = row[14] if len(row) > 14 else ""
+                slp_str = row[15] if len(row) > 15 else ""
+                # NOAA uses format like "55.0,1" where first part is value
+                tmp = float(tmp_str.split(",")[0]) if tmp_str and "," in tmp_str else (float(tmp_str) if tmp_str else 0.0)
+                dew = float(dew_str.split(",")[0]) if dew_str and "," in dew_str else (float(dew_str) if dew_str else 0.0)
+                slp = float(slp_str.split(",")[0]) if slp_str and "," in slp_str else (float(slp_str) if slp_str else 0.0)
+                conn.execute("INSERT INTO weather VALUES (?, ?, ?, ?, ?)", (station, date_val, tmp, dew, slp))
+            except (ValueError, IndexError):
+                continue
+        n_noaa = conn.execute("SELECT COUNT(*) FROM weather").fetchone()[0]
+    else:
+        print("  NOAA CSV not found, creating empty table")
+        conn.execute("CREATE TABLE weather (STATION VARCHAR, DATE VARCHAR, TMP FLOAT, DEW FLOAT, SLP FLOAT)")
+        n_noaa = 0
 
-    # Weather
-    conn.execute("CREATE TABLE weather (STATION VARCHAR, DATE TIMESTAMP, TMP FLOAT, DEW FLOAT, SLP FLOAT)")
-    conn.executemany("INSERT INTO weather VALUES (?, ?, ?, ?, ?)", noaa)
+    # AWID Wi-Fi from CSV (columns: frame.time_epoch=3, wlan.sa=78, radiotap.dbm_antsignal=60, class=83)
+    awid_path = DATASETS_DIR / 'kaggle_wifi' / 'extracted' / 'AWID.csv'
+    if awid_path.exists():
+        print(f"  Loading AWID data from {awid_path.name}...")
+        raw = read_csv_sample(awid_path, N_ROWS)
+        conn.execute("CREATE TABLE wifi_network (frame_time_epoch VARCHAR, wlan_sa VARCHAR, radiotap_dbm_antsignal INTEGER, class VARCHAR)")
+        for row in raw:
+            try:
+                ts = row[3] if len(row) > 3 else ""
+                mac = row[78] if len(row) > 78 else ""
+                sig_str = row[60] if len(row) > 60 else "0"
+                sig = int(float(sig_str)) if sig_str else 0
+                cls = row[83] if len(row) > 83 else "normal"
+                conn.execute("INSERT INTO wifi_network VALUES (?, ?, ?, ?)", (ts, mac, sig, cls))
+            except (ValueError, IndexError):
+                continue
+        n_awid = conn.execute("SELECT COUNT(*) FROM wifi_network").fetchone()[0]
+    else:
+        print("  AWID CSV not found, creating empty table")
+        conn.execute("CREATE TABLE wifi_network (frame_time_epoch VARCHAR, wlan_sa VARCHAR, radiotap_dbm_antsignal INTEGER, class VARCHAR)")
+        n_awid = 0
 
-    # Wi-Fi
-    conn.execute("CREATE TABLE wifi_network (frame_time_epoch TIMESTAMP, wlan_sa VARCHAR, radiotap_dbm_antsignal INTEGER, class VARCHAR)")
-    conn.executemany("INSERT INTO wifi_network VALUES (?, ?, ?, ?)", awid)
+    # Products from derived CSV
+    products_path = DATASETS_DIR / 'uci_online_retail' / 'products.csv'
+    if products_path.exists():
+        print(f"  Loading products data from {products_path.name}...")
+        raw = read_csv_sample(products_path, N_ROWS)
+        conn.execute("CREATE TABLE products (product_name VARCHAR, category VARCHAR, price FLOAT, stock_qty INTEGER)")
+        for row in raw:
+            try:
+                pname = row[1] if len(row) > 1 else ""
+                cat = row[2] if len(row) > 2 else "General"
+                price = float(row[3]) if len(row) > 3 and row[3] else 0.0
+                stock = int(float(row[4])) if len(row) > 4 and row[4] else 0
+                conn.execute("INSERT INTO products VALUES (?, ?, ?, ?)", (pname, cat, price, stock))
+            except (ValueError, IndexError):
+                continue
+        n_products = conn.execute("SELECT COUNT(*) FROM products").fetchone()[0]
+    else:
+        print("  Products CSV not found, creating empty table")
+        conn.execute("CREATE TABLE products (product_name VARCHAR, category VARCHAR, price FLOAT, stock_qty INTEGER)")
+        n_products = 0
 
-    # Products
-    conn.execute("CREATE TABLE products (product_name VARCHAR, category VARCHAR, price FLOAT, stock_qty INTEGER)")
-    conn.executemany("INSERT INTO products VALUES (?, ?, ?, ?)", products)
+    # Orders from derived CSV
+    orders_path = DATASETS_DIR / 'uci_online_retail' / 'orders.csv'
+    if orders_path.exists():
+        print(f"  Loading orders data from {orders_path.name}...")
+        raw = read_csv_sample(orders_path, N_ROWS)
+        conn.execute("CREATE TABLE orders (order_id VARCHAR, customer_id VARCHAR, total_amount FLOAT, order_date DATE, status VARCHAR)")
+        for row in raw:
+            try:
+                oid = row[0] if len(row) > 0 else ""
+                cid = row[1] if len(row) > 1 else "0"
+                amt = float(row[2]) if len(row) > 2 and row[2] else 0.0
+                odate = row[3][:10] if len(row) > 3 else "2011-01-01"
+                status = row[4] if len(row) > 4 else "completed"
+                conn.execute("INSERT INTO orders VALUES (?, ?, ?, ?, ?)", (oid, cid, amt, odate, status))
+            except (ValueError, IndexError):
+                continue
+        n_orders = conn.execute("SELECT COUNT(*) FROM orders").fetchone()[0]
+    else:
+        print("  Orders CSV not found, creating empty table")
+        conn.execute("CREATE TABLE orders (order_id VARCHAR, customer_id VARCHAR, total_amount FLOAT, order_date DATE, status VARCHAR)")
+        n_orders = 0
 
-    # Orders
-    conn.execute("CREATE TABLE orders (order_id INTEGER, customer_id INTEGER, order_date DATE, total_amount FLOAT, status VARCHAR)")
-    conn.executemany("INSERT INTO orders VALUES (?, ?, ?, ?, ?)", orders)
-
-    for table, n in [('earthquakes', len(usgs)), ('weather', len(noaa)), ('wifi_network', len(awid)),
-                     ('products', len(products)), ('orders', len(orders))]:
+    for table, n in [('earthquakes', n_usgs), ('weather', n_noaa), ('wifi_network', n_awid),
+                     ('products', n_products), ('orders', n_orders)]:
         print(f"  Loaded {n} rows into {table}")
 
     return conn

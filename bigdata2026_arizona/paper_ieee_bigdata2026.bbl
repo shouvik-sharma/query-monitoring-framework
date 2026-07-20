@@ -38,12 +38,6 @@ S.~Sharma, ``Query monitoring framework,'' GitHub repository, 2026, accessed:
   \url{https://github.com/shouvik-sharma/query-monitoring-framework}
 \BIBentrySTDinterwordspacing
 
-\bibitem{querylens}
-\BIBentryALTinterwordspacing
-``querylens: {SQL} inspection {CLI},'' GitHub, accessed: Jul. 2026. [Online].
-  Available: \url{https://github.com/querylens/querylens}
-\BIBentrySTDinterwordspacing
-
 \bibitem{sqlaudit}
 \BIBentryALTinterwordspacing
 J.~S. Lee, ``sqlaudit: {SQL} query auditor and optimizer,'' GitHub, 2026.
@@ -94,7 +88,7 @@ Y.~Zhang \emph{et~al.}, ``{LLM4Hint}: Leveraging large language models for hint
 
 \bibitem{keebo2023}
 Keebo, ``Making data clouds smarter: Automated warehouse optimization using
-  data learning,'' Proc. ACM SIGMOD, 2023.
+  data learning,'' in \emph{Proc. ACM SIGMOD Int. Conf. Manage. Data}, 2023.
 
 \bibitem{bress2025snowflake}
 S.~Bress \emph{et~al.}, ``Workload insights from the {Snowflake} data cloud:
@@ -126,7 +120,7 @@ V.~Leis, A.~Gubichev, A.~Mirchev, P.~Boncz, A.~Kemper, and T.~Neumann, ``How
 
 \bibitem{huo2025bird}
 N.~Huo \emph{et~al.}, ``{BIRD-INTERACT}: Re-imagining {Text-to-SQL} evaluation
-  for large language models via dynamic interactions,'' 2025.
+  for large language models via dynamic interactions,'' 2025, arXiv preprint.
 
 \bibitem{yu2018spider}
 T.~Yu, R.~Zhang, K.~Yang \emph{et~al.}, ``{SPIDER}: A large-scale human-labeled
@@ -140,6 +134,10 @@ T.~Yu, R.~Zhang, K.~Yang \emph{et~al.}, ``{SPIDER}: A large-scale human-labeled
   [Online]. Available:
   \url{https://platform.openai.com/docs/models/gpt-4o-mini}
 \BIBentrySTDinterwordspacing
+
+\bibitem{chen2015online}
+D.~Chen, ``Online retail,'' UCI Machine Learning Repository, 2015, accessed:
+  2026-07-18.
 
 \bibitem{usgs2026earthquake}
 \BIBentryALTinterwordspacing
@@ -160,10 +158,5 @@ T.~Yu, R.~Zhang, K.~Yang \emph{et~al.}, ``{SPIDER}: A large-scale human-labeled
   2020, accessed: 2026-07-12. [Online]. Available:
   \url{https://github.com/krishanuskr/AWID-Intrusion-Detection-System-2020}
 \BIBentrySTDinterwordspacing
-
-\bibitem{graefe1993volcano}
-G.~Graefe, ``The volcano optimizer generator: Extensibility and efficient
-  search,'' in \emph{Proc. IEEE Int. Conf. Data Eng. (ICDE)}, 1993, pp.
-  209--218.
 
 \end{thebibliography}

@@ -4,10 +4,10 @@
 Shouvik Sharma is a data engineer at Chime exploring the intersection of large language models and data systems. He builds production-grade tools for automating data operations at scale.
 
 ## Medium Bio (3-4 sentences)
-Shouvik Sharma is a data engineer at Chime specializing in data warehouse optimization and data engineering automation. His research focuses on applying large language models to operational challenges in cloud data warehouses, with a published framework achieving 100% detection accuracy for SQL anti-patterns at negligible LLM cost. In his free time, he explores creative problem-solving in data systems and contributes to open-source data tools.
+Shouvik Sharma is a data engineer at Chime specializing in data warehouse optimization and data engineering automation. His research focuses on applying large language models to operational challenges in cloud data warehouses, with a reproducible framework achieving 96.9% detection accuracy for SQL anti-patterns at negligible LLM cost. In his free time, he explores creative problem-solving in data systems and contributes to open-source data tools.
 
 ## Long Bio (1 paragraph)
-Shouvik Sharma is a data engineer at Chime with 5+ years of experience building data infrastructure and data products. He specializes in SQL optimization, data quality, and automating complex data operations. His current research explores how large language models (LLMs) can solve real operational problems in data engineering—from query optimization to automated semantic validation. Shouvik is an independent researcher interested in creative problem-solving, open-source contribution, and knowledge sharing with the broader data community. His published framework demonstrates 100% detection accuracy for common SQL anti-patterns with zero false positives at a total cost of less than one cent.
+Shouvik Sharma is a data engineer at Chime with 5+ years of experience building data infrastructure and data products. He specializes in SQL optimization, data quality, and automating complex data operations. His current research explores how large language models (LLMs) can solve real operational problems in data engineering-from query optimization to automated semantic validation. Shouvik is an independent researcher interested in creative problem-solving, open-source contribution, and knowledge sharing with the broader data community. His framework demonstrates 96.9% detection accuracy, zero false positives, and 93.3% tested-instance rewrite equivalence at a total cost of less than one cent.
 
 ## Headshot / Avatar
 [Add professional headshot here if publishing]
@@ -44,12 +44,13 @@ I'm available to speak on:
 
 ## Key Stats (Use in Pitches)
 
-- **100%**: Detection accuracy for SQL anti-patterns
+- **96.9%**: Detection accuracy for SQL anti-patterns
 - **0%**: False positive rate
-- **75%**: Semantic match rate for rewrites
-- **$0.000671**: Total LLM API cost
-- **4**: Anti-patterns tested
-- **3**: Public datasets used
+- **93.8%**: Recall on inefficient queries
+- **93.3%**: Tested-instance result-equivalence rate for flagged rewrites
+- **$0.005522**: Total LLM API cost
+- **12**: Anti-pattern types tested
+- **5**: Logical datasets used
 - **0**: ML models to train/maintain
 
 ## Expertis & Credentials

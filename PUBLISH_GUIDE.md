@@ -21,10 +21,11 @@ This guide walks you through publishing your LLM-Powered Query Monitoring resear
 
 # Save results to: research_metrics.json
 {
-  "total_queries": 8,
-  "detection_accuracy": 1.0,
-  "semantic_match_rate": 0.75,
-  "total_llm_cost_usd": 0.000671,
+  "total_queries": 32,
+  "detection_accuracy": 0.969,
+  "recall": 0.938,
+  "semantic_match_rate": 0.933,
+  "total_llm_cost_usd": 0.005522,
   "model": "gpt-4o-mini"
 }
 ```
@@ -104,9 +105,10 @@ Real data from your research...
 
 ## Results
 
-- 100% detection accuracy
+- 96.9% detection accuracy
 - 0% false positives
-- $0.000671 total LLM cost
+- 93.3% tested-instance rewrite equivalence
+- $0.005522 total LLM cost
 
 ## Open Source
 
@@ -244,16 +246,16 @@ By attending, audience will learn:
 
 I built an open-source framework that evaluates LLM-based SQL analysis using reproducible benchmarks:
 
-✅ Ingests public datasets (USGS, NOAA, AWID)
-✅ Detects SQL anti-patterns with 100% accuracy
+✅ Ingests public datasets (USGS, NOAA, AWID, UCI Online Retail)
+✅ Detects SQL anti-patterns with 96.9% accuracy
 ✅ Auto-generates optimized rewrites
 ✅ Validates rewrites through semantic comparison
 
 Results:
-• 100% detection accuracy for SQL anti-patterns
+• 96.9% detection accuracy for SQL anti-patterns
 • 0% false positive rate on baselines
-• 75% semantic match rate on rewrites
-• $0.000671 total LLM cost for 8 queries
+• 93.3% tested-instance result-equivalence on flagged rewrites
+• $0.005522 total LLM cost for 32 queries
 
 📖 Full paper: RESEARCH_PAPER.md
 💻 Open source: https://github.com/shouvik-sharma/query-monitoring-framework
@@ -267,7 +269,7 @@ Just published: "LLM-Powered Query Monitoring Framework"
 
 Reproducible evaluation of LLM-based SQL analysis using public datasets.
 
-📊 100% detection accuracy | 💰 $0.000671 total cost
+📊 96.9% detection accuracy | 💰 $0.005522 total cost
 
 📖 Paper: RESEARCH_PAPER.md
 💻 GitHub: https://github.com/shouvik-sharma/query-monitoring-framework
@@ -279,7 +281,7 @@ Reproducible evaluation of LLM-based SQL analysis using public datasets.
 ```
 Title: LLM-Powered Query Monitoring Framework — Reproducible Evaluation Using Public Data
 
-I built an open-source framework that evaluates LLMs for SQL analysis using public datasets (USGS, NOAA, AWID).
+I built an open-source framework that evaluates LLMs for SQL analysis using public datasets (USGS, NOAA, AWID, and UCI Online Retail).
 
 The problem:
 - Manual SQL review doesn't scale
@@ -288,14 +290,15 @@ The problem:
 
 The solution:
 - Modular framework with pluggable data sources and execution engines
-- 8-query workload (4 baseline, 4 inefficient) with documented anti-patterns
+- 32-query workload (16 baseline, 16 inefficient) with documented anti-patterns
 - Automated semantic validation of rewrites
 
 Results:
-- 100% detection accuracy (4/4 inefficient queries flagged)
+- 96.9% detection accuracy (31/32 queries classified correctly)
 - 0% false positive rate (all baselines correctly passed)
-- 75% semantic match rate (3/4 rewrites preserved exact results)
-- $0.000671 total LLM API cost (GPT-4o-mini)
+- 93.8% recall (15/16 inefficient queries flagged)
+- 93.3% tested-instance result-equivalence (14/15 flagged rewrites)
+- $0.005522 total LLM API cost (GPT-4o-mini)
 
 The framework is fully reproducible using public datasets and open-source tooling.
 

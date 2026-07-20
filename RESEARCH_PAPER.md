@@ -4,7 +4,7 @@
 
 ## Abstract
 
-Manual SQL review does not scale in modern data warehouses. We present an LLM-powered query monitoring framework that identifies inefficient or risky SQL queries, recommends optimized rewrites, and validates recommendations through automated correctness checks. The system ingests public datasets, executes a controlled query workload against DuckDB, stores execution metadata in a SQLite query history database, analyzes queries with an LLM, and validates rewrites through semantic comparison. In our evaluation across three public datasets and eight queries (four baseline and four intentionally inefficient variants), the framework achieved **100% detection accuracy** for common SQL anti-patterns with **zero false positives**, a **75% semantic match rate** across optimized rewrites, and a total LLM API cost of **$0.000671**. The evaluation was conducted on a pilot-scale workload that used a 3-row version of each dataset, enabling sub-millisecond runtimes. These results should be interpreted as pilot-scale evidence of a reproducible query guardrail, not as a production-scale benchmark.
+Manual SQL review does not scale in modern data warehouses. We present an LLM-powered query monitoring framework that identifies inefficient or risky SQL queries, recommends optimized rewrites, and validates recommendations through automated correctness checks. The system ingests public datasets, executes a controlled query workload against DuckDB, stores execution metadata in a SQLite query history database, analyzes queries with an LLM, and validates rewrites through semantic comparison. In our evaluation across five logical datasets and 32 queries (16 baseline and 16 intentionally inefficient variants), the framework achieved **96.9% detection accuracy**, **0.0% false positive rate**, **93.8% recall**, a **93.3% tested-instance result-equivalence rate** across flagged rewrites, and a total LLM API cost of **$0.005522**. The evaluation used 500-row in-memory DuckDB tables and should be interpreted as a reproducible query-governance artifact, not as a production-scale performance benchmark.
 
 ## Introduction
 
@@ -32,7 +32,7 @@ The TPC-H [14] and TPC-DS [15] benchmarks remain the standard for evaluating ana
 
 ### 2.5 Gap Statement
 
-Existing work falls into three largely disconnected categories: static rule-based tools that are fast but semantically shallow, LLM-based optimizers that lack end-to-end monitoring and validated rewrite execution, and warehouse-level governance systems that operate on aggregate metrics rather than individual query semantics. No prior work combines all four elements -- reproducible dataset ingestion, SQL anti-pattern detection via LLMs, automated rewrite validation through execution, and cost-accounted reporting -- into a single open-source, auditable artifact. Our framework addresses this gap by providing a modular pipeline that connects public datasets, an execution engine, a structured query-history store, LLM-based analysis with automated rewrite validation, and cost reporting. The focus on pilot-scale reproducibility (3-row datasets, DuckDB, SQLite) ensures that every claim can be independently verified without access to production infrastructure.
+Existing work falls into three largely disconnected categories: static rule-based tools that are fast but semantically shallow, LLM-based optimizers that lack end-to-end monitoring and validated rewrite execution, and warehouse-level governance systems that operate on aggregate metrics rather than individual query semantics. No prior work combines all four elements -- reproducible dataset ingestion, SQL anti-pattern detection via LLMs, automated rewrite validation through execution, and cost-accounted reporting -- into a single open-source, auditable artifact. Our framework addresses this gap by providing a modular pipeline that connects public datasets, an execution engine, a structured query-history store, LLM-based analysis with automated rewrite validation, and cost reporting. The focus on pilot-scale reproducibility (500-row DuckDB tables and a SQLite telemetry store) ensures that every claim can be independently verified without access to production infrastructure.
 
 ## System Design
 
@@ -156,7 +156,7 @@ Recommendations are not accepted purely on model output. The rewritten SQL is ex
 
 ## Experimental Setup
 
-The experiment uses three public datasets: USGS earthquake records, NOAA weather records, and the AWID intrusion-detection dataset. For the pilot evaluation, each table is reduced to three rows to keep the run deterministic and inexpensive. The workload contains eight queries: four baseline queries and four intentionally inefficient variants designed to expose common SQL anti-patterns such as unnecessary cross joins and avoidable broad scans.
+The experiment uses five logical tables derived from public external datasets: USGS earthquake records, NOAA weather records, AWID Wi-Fi traffic, UCI Online Retail products, and UCI Online Retail orders. For the pilot evaluation, each table is sampled to 500 rows to keep the run deterministic and inexpensive. The workload contains 32 queries: 16 baseline queries and 16 intentionally inefficient variants covering 12 anti-pattern types, including `select_star`, `missing_predicate`, `cross_join`, `redundant_subquery`, `non_sargable`, `missing_group_col`, `implicit_coercion`, `missing_limit`, `or_vs_in`, `union_all`, `like_prefix`, and `distinct_group`.
 
 The reproducible pipeline is script-driven. `maintain_datasets.py` prepares data, `create_db.py` initializes the SQLite store from `schema/query_history_schema.sql`, `execute_query_workload.py` executes the SQL workload, `llm_analysis.py` performs LLM scoring and rewrite generation, and the report scripts summarize accuracy, semantic match, runtime, and cost.
 
@@ -164,13 +164,14 @@ The reproducible pipeline is script-driven. `maintain_datasets.py` prepares data
 
 ### 7.1 Detection Accuracy
 
-The LLM analyzer achieved perfect separation between baseline and inefficient queries. All four intentionally inefficient queries received risk scores above the threshold ($\tau = 40$), while all four baseline queries scored well below it, yielding:
+The LLM analyzer correctly separated nearly all baseline and inefficient queries. Fifteen of sixteen intentionally inefficient queries received risk scores at or above the threshold ($\tau = 40$), while all sixteen baseline queries scored below it, yielding:
 
-- **Detection accuracy**: $\frac{4 + 4}{4 + 4 + 0 + 0} = 100\%$
-- **False positive rate**: $\frac{0}{0 + 4} = 0\%$
+- **Detection accuracy**: $\frac{15 + 16}{32} = 96.9\%$
+- **False positive rate**: $\frac{0}{0 + 16} = 0.0\%$
+- **Recall**: $\frac{15}{15 + 1} = 93.8\%$
 - **Average baseline risk score**: 15.0 / 100
-- **Average inefficient risk score**: 71.2 / 100
-- **Separation margin**: 56.2 points
+- **Average inefficient risk score**: 57.2 / 100
+- **Separation margin**: 42.2 points
 
 ![Detection Accuracy](figures/detection_accuracy.png)
 
@@ -178,14 +179,14 @@ The LLM analyzer achieved perfect separation between baseline and inefficient qu
 
 ![Score Distribution](figures/score_distribution.png)
 
-**Figure 2**: Distribution of risk scores. Baseline queries cluster tightly at 15/100, while inefficient queries span 55--90/100 with no overlap.
+**Figure 2**: Distribution of risk scores. Baseline queries cluster tightly at 15/100, while inefficient queries span 35--90/100. The single score below threshold is the UNION-vs-UNION-ALL variant.
 
 ### 7.2 Semantic Validation
 
-Three of the four rewritten queries preserved semantic equivalence under our validation checks (row count equality and result checksum match). The cross-join rewrite was correctly flagged as a mismatch because the original Cartesian product returned 9 rows while the corrected inner-join version returned 3 rows:
+Fourteen of the fifteen flagged rewrite attempts preserved tested-instance result equivalence under the validation checks (row-count equality and result checksum match). The only mismatch was the `missing_group_col` correctness-repair case: the original query failed under DuckDB's strict aggregation rules, while the rewritten query executed and returned one grouped row.
 
 $$
-\text{Semantic match rate} = \frac{3}{4} = 75\%
+\text{Result-equivalence rate} = \frac{14}{15} = 93.3\%
 $$
 
 ![Semantic Validation](figures/semantic_validation.png)
@@ -194,31 +195,31 @@ $$
 
 ### 7.3 Runtime Comparison
 
-Runtime measurements were recorded at sub-millisecond scale (3-row datasets). These values are dominated by Python interpreter and DuckDB initialization overhead rather than query-processing cost. The structural improvements -- column projection narrowing, predicate addition, join correction, and subquery flattening -- are the meaningful outcomes and would translate to measurable savings at warehouse scale.
+Runtime measurements were recorded on 500-row in-memory DuckDB tables. The current run recorded an average runtime delta of -7.14% across all flagged rewrites and a median delta of 2.38%; among the 14 tested-instance-equivalent rewrites, the median delta was 4.87%. These values are dominated by Python and DuckDB overhead at this scale, so they should be interpreted as instrumentation checks rather than production-speedup claims.
 
 ![Runtime Comparison](figures/runtime_comparison.png)
 
-**Figure 4**: Original vs. rewritten query runtime (ms). Differences of 1--2 ms reflect measurement noise on 3-row tables.
+**Figure 4**: Original vs. rewritten query runtime (ms). Differences of a few milliseconds reflect measurement noise on 500-row in-memory tables.
 
 ### 7.4 LLM API Cost
 
-Total LLM API cost across all 8 analyses was **\$0.000671**, or approximately \$0.000084 per query analyzed:
+Total LLM API cost across all 32 analyses was **\$0.005522**, or approximately \$0.000173 per query analyzed:
 
 | Metric | Value |
 |:-------|------:|
-| Total LLM cost (8 analyses) | \$0.000671 |
-| Cost per analyzed query | \$0.000084 |
-| Cost per successful rewrite (3 valid) | \$0.000224 |
+| Total LLM cost (32 analyses) | \$0.005522 |
+| Cost per analyzed query | \$0.000173 |
+| Cost per tested-instance-equivalent rewrite (14 valid) | \$0.000394 |
 
 ![LLM Cost Breakdown](figures/llm_cost_breakdown.png)
 
 **Figure 5**: Per-query LLM API cost in micro-USD. The dotted line marks the mean cost across all analyses.
 
-These costs use the GPT-4o-mini pricing model (\$0.15/1M input tokens, \$0.60/1M output tokens). At this rate, analyzing 10,000 queries would cost approximately \$0.84, making LLM-powered query guardrails economically practical for continuous deployment.
+These costs use the GPT-4o-mini pricing model (\$0.15/1M input tokens, \$0.60/1M output tokens). At this rate, analyzing 10,000 queries would cost approximately \$1.73, making LLM-powered query guardrails economically practical for continuous deployment.
 
 ### 7.5 Summary
 
-The pilot evaluation demonstrates that the framework achieves its primary design goals: reliable anti-pattern detection, structured rewrite generation, automated validation, and negligible LLM cost. All results are reproducible by cloning the repository, configuring an OpenAI API key, and running the pipeline scripts. The intentional use of 3-row datasets eliminates confounding volume effects and isolates detection behavior, but also means that runtime-based performance claims must be deferred to warehouse-scale validation.
+The pilot evaluation demonstrates that the framework achieves its primary design goals: reliable anti-pattern detection, structured rewrite generation, automated validation, and negligible LLM cost. All results are reproducible by cloning the repository and running the pipeline scripts; without an OpenAI API key, the artifact uses deterministic simulation mode. The intentional use of 500-row in-memory DuckDB tables isolates detection and validation behavior, but runtime-based performance claims must be deferred to warehouse-scale validation.
 
 ## Discussion
 
@@ -228,8 +229,8 @@ The current system is best viewed as an artifact for controlled experimentation 
 
 ## Limitations
 
-- **Pilot-scale evaluation**: The experiment used only 3 rows per table to isolate detection behavior from volume effects; runtime deltas are dominated by measurement noise.
-- **Small query count**: Only 8 queries were evaluated (4 baseline and 4 intentionally inefficient). Larger query corpora are required for statistical confidence.
+- **Pilot-scale evaluation**: The experiment used 500 rows per table to isolate detection behavior from volume effects; runtime deltas are dominated by measurement noise.
+- **Small query count**: Only 32 queries were evaluated (16 baseline and 16 intentionally inefficient). Larger query corpora are required for statistical confidence.
 - **DuckDB-only runtime**: The execution engine currently targets DuckDB and does not yet support production systems such as Snowflake, BigQuery, Redshift, or PostgreSQL.
 - **SQLite query history**: SQLite is appropriate for the local artifact but is not designed for high-concurrency production telemetry.
 - **LLM dependency**: Cost, latency, and recommendation quality depend on the configured OpenAI model. Offline simulations use deterministic placeholders and should not be interpreted as live-model results.
@@ -237,7 +238,7 @@ The current system is best viewed as an artifact for controlled experimentation 
 
 ## Conclusion
 
-This paper presents an open-source framework for evaluating LLM-powered SQL query monitoring and optimization. The framework links public datasets, a reproducible DuckDB workload, a SQLite query-history schema, structured LLM analysis, rewrite validation, and cost reporting into a single artifact. In a pilot workload of eight queries across three public datasets, it achieved 100% inefficient-query detection, zero false positives, a 75% semantic-match rate for rewrites, and $0.000671 in total LLM API cost.
+This paper presents an open-source framework for evaluating LLM-powered SQL query monitoring and optimization. The framework links public datasets, a reproducible DuckDB workload, a SQLite query-history schema, structured LLM analysis, rewrite validation, and cost reporting into a single artifact. In a pilot workload of 32 queries across five logical datasets, it achieved 96.9% detection accuracy, zero false positives, 93.8% recall, a 93.3% tested-instance result-equivalence rate for flagged rewrites, and $0.005522 in total LLM API cost.
 
 The results do not establish production-scale performance. Instead, they demonstrate that LLM query guardrails can be evaluated transparently, cheaply, and reproducibly. Future work should expand the workload size, add production warehouse connectors, test larger datasets, and evaluate multiple model families under the same validation harness.
 
@@ -293,7 +294,7 @@ The results do not establish production-scale performance. Instead, they demonst
 
 ## Appendix A: Dataset Manifest
 
-The artifact uses public external datasets from USGS, NOAA, and AWID. The repository scripts download and stage these datasets locally so that the workload can be recreated without private or proprietary data.
+The artifact uses public external datasets from USGS, NOAA, AWID, and UCI Online Retail. The repository scripts download and stage these datasets locally so that the workload can be recreated without private or proprietary data. The products and orders tables are derived from the UCI Online Retail workbook.
 
 ## Appendix B: Full Query History Schema
 
